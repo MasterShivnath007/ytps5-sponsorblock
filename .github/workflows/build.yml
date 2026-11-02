@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LLVM 18
+        run: brew install llvm@18
+
+      - name: Download PS5 payload SDK
+        run: |
+          mkdir -p "$RUNNER_TEMP/ps5sdk"
+          curl -L --fail --retry 3 \
+            -o "$RUNNER_TEMP/ps5sdk/sdk.tar.gz" \
+            https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.41.1/ps5-payload-dev.tar.gz
+          tar -xzf "$RUNNER_TEMP/ps5sdk/sdk.tar.gz" -C "$RUNNER_TEMP/ps5sdk"
+
+      - name: Build
+        env:
+          PS5_PAYLOAD_SDK: ${{ runner.temp }}/ps5sdk/opt/ps5-payload-sdk
+          LLVM_CONFIG: /opt/homebrew/opt/llvm@18/bin/llvm-config
+        run: |
+          make
+          ls -lh build/
+
+      - name: Package release files
+        run: |
+          mkdir -p dist
+          cp build/ytps5-injector.elf dist/
+          cp build/sponsorblock.so dist/
+          cp payload/inject.js dist/
+          cp -R tools dist/
+          cp README.md LICENSE THIRD_PARTY_NOTICES.md dist/
+          (cd dist && zip -r ../ytps5-sponsorblock.zip .)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ytps5-sponsorblock
+          path: |
+            build/ytps5-injector.elf
+            build/sponsorblock.so
+            payload/inject.js
+            ytps5-sponsorblock.zip

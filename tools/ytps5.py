@@ -197,6 +197,8 @@ def build_parser() -> argparse.ArgumentParser:
                       help="only upload, do not send the ELF")
     send.add_argument("--wait", type=int, default=0,
                       help="seconds to wait before printing logs")
+    send.add_argument("--save", action="store_true",
+                      help="also save logs under ./logs/ when --wait is used")
     send.set_defaults(func=cmd_send)
 
     logs = sub.add_parser("logs", help="download logs over FTP")

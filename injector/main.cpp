@@ -167,6 +167,8 @@ static uint64_t find_html_execute(Hijacker *h, std::string &where) {
       "49 89 D5 48 8B 15 ?? ?? ?? ?? 48 8B 02 48 89 45 D0",
       "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 "
       "41 56 41 57 48 81 EC",
+      "F3 0F 1E FA 55 48 89 E5 41 57 41 56 41 55 41 54 53 48 81 EC "
+      "?? ?? ?? ?? 49 89 D5",
   };
 
   auto try_lib = [&](SharedLib *lib, bool verbose) -> uint64_t {
@@ -299,6 +301,14 @@ int main() {
     sceKernelPrepareToResumeProcess(pid);
     sceKernelResumeProcess(pid);
     return 5;
+  }
+
+  logf("loaded modules:");
+  for (auto lib : hijacker->getLibs()) {
+    const auto *text = lib->getTextSection();
+    logf("  %s text=%p size=0x%zx", lib->getPath().c_str(),
+         text ? (void *)text->start() : nullptr,
+         text ? text->sectionLength() : 0);
   }
 
   std::string where;

@@ -50,6 +50,10 @@ static const char *kThirdSig =
     "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 "
     "41 56 41 57 48 81 EC";
 
+static const char *kEndbrSig =
+    "F3 0F 1E FA 55 48 89 E5 41 57 41 56 41 55 41 54 53 48 81 EC "
+    "?? ?? ?? ?? 49 89 D5";
+
 static bool load_payload_file(const char *path, std::string &out) {
   if (!path || !path[0]) return false;
   FILE *fp = fopen(path, "rb");
@@ -110,6 +114,7 @@ static uint64_t find_html_execute() {
   uint64_t addr = scan_maps_for_signature(kPrimarySig);
   if (!addr) addr = scan_maps_for_signature(kBroadSig);
   if (!addr) addr = scan_maps_for_signature(kThirdSig);
+  if (!addr) addr = scan_maps_for_signature(kEndbrSig);
   return addr;
 }
 

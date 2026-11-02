@@ -105,8 +105,15 @@ $(BUILD)/ytps5-injector.elf: hook-blob $(INJECTOR_OBJ)
 
 injector: $(BUILD)/ytps5-injector.elf
 
-rack: all
-	@ls -lh $(BUILD)/ytps5-injector.elf $(BUILD)/sponsorblock.so
+dist: all
+	@mkdir -p dist/tools dist/docs
+	@cp $(BUILD)/ytps5-injector.elf $(BUILD)/sponsorblock.so dist/
+	@cp payload/inject.js dist/
+	@cp tools/ytps5.py tools/run_test.sh dist/tools/
+	@cp README.md LICENSE THIRD_PARTY_NOTICES.md dist/
+	@cp docs/TESTING.md docs/HOW_IT_WORKS.md dist/docs/
+	@(cd dist && zip -qr ../ytps5-sponsorblock.zip .)
+	@ls -lh ytps5-sponsorblock.zip
 
 clean:
-	rm -rf $(BUILD) injector/hook_blob.h module/payload_js.h
+	rm -rf $(BUILD) dist ytps5-sponsorblock.zip injector/hook_blob.h module/payload_js.h

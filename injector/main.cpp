@@ -189,6 +189,7 @@ static uint64_t find_html_execute(Hijacker *h, std::string &where) {
       "41 56 41 57 48 81 EC",
       "F3 0F 1E FA 55 48 89 E5 41 57 41 56 41 55 41 54 53 48 81 EC "
       "?? ?? ?? ?? 49 89 D5",
+      "55 48 89 E5 41 57 41 56 41 55 41 54 53 48 83 EC",
   };
 
   auto try_lib = [&](SharedLib *lib, bool verbose) -> uint64_t {

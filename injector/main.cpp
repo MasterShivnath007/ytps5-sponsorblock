@@ -70,23 +70,43 @@ static bool youtube_title(const char *tid) {
 }
 
 static bool find_youtube(int &pid, int &appid, char *title, size_t title_size) {
-  appid = sceSystemServiceGetAppIdOfRunningBigApp();
-  if (appid < 0) return false;
+  /* Fast path: the foreground big app. */
+  int big = sceSystemServiceGetAppIdOfRunningBigApp();
+  if (big >= 0) {
+    memset(title, 0, title_size);
+    if (sceSystemServiceGetAppTitleId(big, title) == 0 &&
+        youtube_title(title)) {
+      for (int i = 0; i < 10000; ++i) {
+        int candidate = 0;
+        if (_sceApplicationGetAppId(i, &candidate) < 0) continue;
+        if (candidate == big) {
+          pid = i;
+          appid = big;
+          return true;
+        }
+      }
+    }
+  }
 
-  memset(title, 0, title_size);
-  if (sceSystemServiceGetAppTitleId(appid, title) != 0) return false;
-  if (!youtube_title(title)) return false;
-
-  pid = -1;
+  /* YouTube is a media app on some firmware and may not be reported as the
+   * running big app. Walk the application table instead. */
   for (int i = 0; i < 10000; ++i) {
     int candidate = 0;
     if (_sceApplicationGetAppId(i, &candidate) < 0) continue;
-    if (candidate == appid) {
-      pid = i;
-      break;
+    char candidate_title[256] = {0};
+    if (sceSystemServiceGetAppTitleId(candidate, candidate_title) != 0) {
+      continue;
     }
+    if (!youtube_title(candidate_title)) continue;
+
+    pid = i;
+    appid = candidate;
+    strncpy(title, candidate_title, title_size - 1);
+    title[title_size - 1] = 0;
+    return true;
   }
-  return pid >= 0;
+
+  return false;
 }
 
 static uint8_t *scan_buffer(uint8_t *buf, size_t size, const char *signature) {

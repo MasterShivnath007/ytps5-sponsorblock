@@ -72,7 +72,7 @@ python3 tools/ytps5.py logs --host <PS5_IP> --save
 
 - `data_ytps5-sponsorblock_injector.log`
 - `data_ytps5-sponsorblock_ytps5.log`
-- `download0_ytps5.log` (if the module used the fallback path)
+- `sandbox_..._hui_dev_yt.log` (Cobalt's own log, read-only)
 
 Open an issue and attach those files plus:
 

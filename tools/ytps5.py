@@ -28,10 +28,6 @@ DEFAULT_JS = ROOT / "payload" / "inject.js"
 LOG_FILES = [
     f"{REMOTE_DIR}/injector.log",
     f"{REMOTE_DIR}/ytps5.log",
-    "/download0/ytps5.log",
-    "/mnt/sandbox/PPSA01650_000/download0/ytps5.log",
-    "/mnt/sandbox/PPSA01651_000/download0/ytps5.log",
-    "/mnt/sandbox/PPSA01652_000/download0/ytps5.log",
     "/mnt/sandbox/PPSA01650_000/download0/hui/dev/yt.log",
     "/mnt/sandbox/PPSA01651_000/download0/hui/dev/yt.log",
     "/mnt/sandbox/PPSA01652_000/download0/hui/dev/yt.log",

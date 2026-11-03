@@ -35,8 +35,8 @@ void mh_log(const char *fmt, ...) {
 
   sceKernelDebugOutText(0, buf);
 
-  const char *paths[2] = {g_log_path, "/download0/ytps5.log"};
-  for (int i = 0; i < 2; ++i) {
+  const char *paths[1] = {g_log_path};
+  for (int i = 0; i < 1; ++i) {
     if (!paths[i][0]) continue;
     FILE *fp = fopen(paths[i], "a");
     if (fp) {

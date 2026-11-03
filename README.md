@@ -5,13 +5,15 @@
 [![Firmware: 8.20](https://img.shields.io/badge/firmware-8.20-black.svg)](#compatibility)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github)](https://github.com/sponsors/MasterShivnath007)
 
-**A runtime quality-of-life mod for the official PS5 video app on jailbroken consoles.**
+**Block YouTube ads and skip sponsor segments in the official PS5 video app on a jailbroken PS5.**
 
-It adds ad filtering, SponsorBlock skipping, and a native settings panel with
-support/QR and update notifications. It does **not** contain, modify, or
-redistribute the app, app packages, console keys, DRM tools, or any copyrighted
-app files. It attaches to the app you already own and patches the running
-process in memory.
+ytps5 is a runtime quality-of-life mod. It adds ad filtering, SponsorBlock
+skipping, and a native settings panel with support/QR and update notifications.
+It does **not** contain, modify, or redistribute the app, app packages, console
+keys, DRM tools, or any copyrighted app files. It attaches to the app you
+already own and patches the running process in memory.
+
+**Website:** https://mastershivnath007.github.io/ytps5-sponsorblock/
 
 > **Research and educational project.** Not affiliated with Sony, Google,
 > YouTube, SponsorBlock, or any app vendor. No app packages, keys, DRM bypass
@@ -211,6 +213,44 @@ There is no paywalled feature, telemetry, or mandatory account. See
 - More detailed settings (per-category controls, playback options, proxy status).
 - Investigate the occasional 4–5 video startup delay.
 - Keep the `HTMLScriptExecute` signature current for future app updates.
+
+## FAQ
+
+### How do I block YouTube ads on a PS5?
+On a jailbroken PS5, run `ytps5.elf` once with Payload Manager, then open the
+clean app `PPSA01652`. ytps5 filters in-player, feed and hero ads in memory; it
+does not patch the installed app package. See [Install](#install-single-file).
+
+### Does ytps5 work on PS5 firmware 8.20?
+FW 8.20 with `PPSA01652` is the only tested combination. Other firmware or app
+builds are untested because the `HTMLScriptExecute` signature can differ.
+
+### Do I need a jailbroken PS5?
+Yes. ytps5 attaches to the running app with libhijacker and patches the process
+in memory. It does not run on stock firmware.
+
+### Is ytps5 free?
+Yes. It is GPL-3.0, with no paywalled features, account, or telemetry.
+
+### Will it work on PPSA01650 or PPSA01651?
+No. Those are commonly used as Y2JB daily drivers, and the tool deliberately
+refuses to patch them. Use a clean app such as `PPSA01652`.
+
+### Does it support SponsorBlock?
+Yes. SponsorBlock segments are fetched from the public API through the local
+proxy and skipped with a toast. Categories can be toggled in ytps5 Settings.
+
+### Can I use it on a PS4 or PS5 Pro?
+It targets the native PS5 app on FW 8.20. PS4-compatibility titles such as
+`CUSA01116` and untested hardware are unsupported.
+
+### How do I uninstall it?
+Reboot the console, or close the app. The patch is memory-only and is not
+written to the app, save data, or `download0.dat`.
+
+### Where are the logs?
+`/data/ytps5-sponsorblock/` contains `relay.log`, `injector.log`, and
+`proxy_server.log`. Attach them to bug reports with your firmware and title ID.
 
 ## Legal and safety
 

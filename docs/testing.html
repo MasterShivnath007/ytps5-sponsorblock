@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testing ytps5 — PS5 FW 8.20 / PPSA01652</title>
+<meta name="description" content="Test procedure and checklist for ytps5 on PS5 firmware 8.20 with the clean app PPSA01652. Do not test on the Y2JB daily drivers PPSA01650 or PPSA01651.">
+<meta name="author" content="MasterShivnath007">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0b1220">
+<link rel="canonical" href="https://mastershivnath007.github.io/ytps5-sponsorblock/testing.html">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="./" aria-label="ytps5 home">
+      <img src="icon.svg" alt="" width="26" height="26">
+      ytps5 <span>unofficial PS5 runtime mod</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="./#features">Features</a>
+      <a href="./#compatibility">Compatibility</a>
+      <a href="./#install">Install</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="./#faq">FAQ</a>
+      <a class="nav-cta" href="https://github.com/MasterShivnath007/ytps5-sponsorblock" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="article">
+  <div class="wrap">
+    <a class="back" href="./">← Back to ytps5</a>
+    <div class="kicker">Test procedure</div>
+    <h1>Testing ytps5</h1>
+    <p class="lede">
+      Test target: <strong>PS5 firmware 8.20</strong>, Y2JB + Relapse, etaHEN with
+      FTP on <code>2121</code> and <code>elfldr</code> on <code>9021</code>, clean
+      app <code>PPSA01652</code>.
+    </p>
+    <div class="notice">
+      <strong>Do not test on <code>PPSA01650</code>/<code>PPSA01651</code>.</strong>
+      Those are Y2JB daily drivers and the injector deliberately refuses them.
+    </div>
+
+    <h2>Build</h2>
+    <pre><code>export PS5_PAYLOAD_SDK=/opt/ps5-payload-sdk
+export LLVM_CONFIG=/opt/homebrew/opt/llvm@18/bin/llvm-config
+make minify
+make installer</code></pre>
+    <p><code>build/ytps5-installer.elf</code> is the single file to upload.</p>
+
+    <h2>Install</h2>
+    <ol>
+      <li>Upload <code>ytps5-installer.elf</code> in Payload Manager (or place it in the local payloads folder) and run it.</li>
+      <li>Confirm the toast <strong>“ytps5: waiting for the supported app”</strong>.</li>
+      <li>Open <code>PPSA01652</code>.</li>
+      <li>Expect a short freeze, then <strong>“ytps5: hook installed”</strong> and <strong>“N script(s) injected”</strong>.</li>
+    </ol>
+
+    <h2>Checklist</h2>
+    <ul>
+      <li>App launches to the home screen.</li>
+      <li>No in-player ads play.</li>
+      <li>Feed/hero sponsored cards are gone.</li>
+      <li>Settings → <strong>ytps5 Settings</strong> opens.</li>
+      <li>Ad Block / SponsorBlock / category toggles work.</li>
+      <li><strong>Support master_shivnath</strong> opens the QR panel.</li>
+      <li>SponsorBlock finds and skips a known segment.</li>
+      <li>Close and reopen the app; it is patched automatically without rerunning the installer.</li>
+      <li>Run the installer on a clean boot; it starts the proxy and injector.</li>
+    </ul>
+
+    <h2>Logs</h2>
+    <pre><code>python3 tools/ytps5.py logs --host &lt;PS5_IP&gt; --save</code></pre>
+    <p>Or read from the console:</p>
+    <ul>
+      <li><code>/data/ytps5-sponsorblock/relay.log</code></li>
+      <li><code>/data/ytps5-sponsorblock/injector.log</code></li>
+      <li><code>/data/ytps5-sponsorblock/proxy_server.log</code></li>
+    </ul>
+    <p>
+      Expected injector stages include <code>app suspended</code>,
+      <code>kernel_mprotect</code>, <code>installed target</code>,
+      <code>resumed</code>, and <code>calls=... injected=...</code>.
+    </p>
+
+    <h2>Failure notes</h2>
+    <ul>
+      <li><strong>Stuck launch screen:</strong> reboot and rerun the installer. Verify the app is the tested build and that you did not try to patch a Y2JB app.</li>
+      <li><strong>No SponsorBlock:</strong> check that the proxy is listening (<code>curl http://&lt;PS5_IP&gt;:4040/ping</code> from the same network should return <code>[]</code>).</li>
+      <li><strong>No update toast:</strong> confirm <code>version.json</code> exists on <code>main</code>.</li>
+    </ul>
+
+    <p style="margin-top:28px">
+      <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/blob/main/docs/TESTING.md">Source Markdown</a>
+      · <a href="how-it-works.html">How it works</a>
+      · <a href="./#install">Install ytps5</a>
+    </p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div><strong style="color:var(--text)">ytps5</strong> — unofficial runtime mod for the official PS5 video app.</div>
+      <div class="footer-links">
+        <a href="./">Home</a>
+        <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock">Repository</a>
+        <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest">Release</a>
+        <a href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+    <p class="trademark">
+      PlayStation is a trademark of Sony Interactive Entertainment Inc. YouTube is
+      a trademark of Google LLC. SponsorBlock is an independent community project.
+      ytps5 is an independent, unofficial project and is not affiliated with,
+      endorsed by, or sponsored by any of these companies or projects. No app
+      packages, console keys, DRM tools, or copyrighted files are distributed.
+    </p>
+  </div>
+</footer>
+</body>
+</html>

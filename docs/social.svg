@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="630" viewBox="0 0 1280 630" role="img" aria-label="ytps5 — ad filtering and SponsorBlock for the official PS5 video app">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="0%" r="75%">
+      <stop offset="0%" stop-color="#ff8a3d" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#16233c"/>
+      <stop offset="100%" stop-color="#0e1729"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="630" fill="#0b1220"/>
+  <rect width="1280" height="630" fill="url(#glow)"/>
+
+  <g fill="none" stroke="#22314e">
+    <rect x="40" y="40" width="1200" height="550" rx="28"/>
+  </g>
+
+  <text x="96" y="150" fill="#ff8a3d" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="4">UNOFFICIAL · PS5 FW 8.20</text>
+
+  <text x="96" y="248" fill="#e8eefc" font-family="Arial, Helvetica, sans-serif" font-size="82" font-weight="800" letter-spacing="-2">ytps5</text>
+
+  <text x="96" y="330" fill="#e8eefc" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700" letter-spacing="-1">Block YouTube ads and skip</text>
+  <text x="96" y="390" fill="#e8eefc" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700" letter-spacing="-1">sponsor segments on the PS5.</text>
+
+  <text x="96" y="462" fill="#9aa8c7" font-family="Arial, Helvetica, sans-serif" font-size="25">Ad filtering · SponsorBlock · native settings · one ELF via Payload Manager</text>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="96" y="512" width="250" height="44" rx="10" fill="#ff8a3d"/>
+    <text x="221" y="541" fill="#1a1008" font-size="20" font-weight="700" text-anchor="middle">GPL-3.0 · free</text>
+
+    <rect x="362" y="512" width="290" height="44" rx="10" fill="none" stroke="#22314e"/>
+    <text x="507" y="541" fill="#e8eefc" font-size="20" font-weight="600" text-anchor="middle">FW 8.20 · PPSA01652</text>
+  </g>
+
+  <text x="96" y="596" fill="#6f7f9f" font-family="Arial, Helvetica, sans-serif" font-size="19">No app packages · no console keys · no DRM tools · research/educational</text>
+
+  <text x="1184" y="596" fill="#6f7f9f" font-family="Arial, Helvetica, sans-serif" font-size="18" text-anchor="end">github.com/MasterShivnath007/ytps5-sponsorblock</text>
+</svg>

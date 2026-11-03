@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How ytps5 works — runtime patch for the PS5 video app</title>
+<meta name="description" content="How ytps5 patches the PS5 video app at runtime: libhijacker attach, an HTMLScriptExecute prologue hook, a local SponsorBlock proxy, and a resident injector.">
+<meta name="author" content="MasterShivnath007">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0b1220">
+<link rel="canonical" href="https://mastershivnath007.github.io/ytps5-sponsorblock/how-it-works.html">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="./" aria-label="ytps5 home">
+      <img src="icon.svg" alt="" width="26" height="26">
+      ytps5 <span>unofficial PS5 runtime mod</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="./#features">Features</a>
+      <a href="./#compatibility">Compatibility</a>
+      <a href="./#install">Install</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="./#faq">FAQ</a>
+      <a class="nav-cta" href="https://github.com/MasterShivnath007/ytps5-sponsorblock" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="article">
+  <div class="wrap">
+    <a class="back" href="./">← Back to ytps5</a>
+    <div class="kicker">Technical overview</div>
+    <h1>How ytps5 works</h1>
+    <p class="lede">
+      ytps5 is a runtime patch for the official PS5 video app. It does not modify
+      the installed app package, does not use console keys, and does not
+      distribute any app files.
+    </p>
+
+    <h2>Components</h2>
+    <ul>
+      <li><code>ytps5.elf</code> — the single-file installer. It embeds the proxy and injector and hands both to the console's own <code>elfldr</code> on <code>127.0.0.1:9021</code>.</li>
+      <li><strong>Proxy</strong> (<code>injector/dump_server.c</code>) — a small local HTTP service on port <code>4040</code>. It fetches SponsorBlock data and <code>version.json</code> over HTTPS.</li>
+      <li><strong>Injector</strong> (<code>injector/main.cpp</code>) — attaches to the clean app process, finds <code>HTMLScriptExecute</code>, installs a trampoline and hook, and stays resident.</li>
+      <li><strong>Hook</strong> (<code>injector/direct_hook.c</code>) — a tiny position-independent blob that prepends the JavaScript payload to each script.</li>
+      <li><strong>Payload</strong> (<code>payload/inject.src.js</code>, minified to <code>payload/inject.js</code>) — ad filtering, SponsorBlock skipping, the settings panel, and update checks.</li>
+    </ul>
+
+    <h2>Flow</h2>
+    <ol>
+      <li>The installer sends the proxy and injector to <code>elfldr</code>.</li>
+      <li>The injector waits for a <code>PPSA0165x</code> app. It refuses <code>PPSA01650</code>/<code>PPSA01651</code> (Y2JB daily drivers) and waits for a clean title.</li>
+      <li>It attaches with libhijacker, finds <code>HTMLScriptExecute</code>, and makes the target page writable from the kernel side.</li>
+      <li>It installs a <code>scePadRead</code> GOT trigger. On the next controller poll, the trigger applies the <code>HTMLScriptExecute</code> prologue patch from inside the app's own input loop, avoiding a race with a live script call.</li>
+      <li>The <code>HTMLScriptExecute</code> hook calls a trampoline containing the original prologue, then calls the original function with a combined string:</li>
+    </ol>
+    <pre><code>&lt;our JavaScript payload&gt;
+&lt;the original script&gt;</code></pre>
+    <ol start="6">
+      <li>The JavaScript runs in the page context and is idempotent. It filters ad objects from API responses, watches the video element, fetches SponsorBlock segments through the local proxy, and skips matching segments.</li>
+      <li>The injector stays resident. When the app closes, it waits for the next launch and patches the new process.</li>
+    </ol>
+
+    <h2>Settings</h2>
+    <p>
+      The app's settings response is patched lazily, only when the settings screen
+      is opened. The “Premium” row becomes “ytps5 Settings”; the
+      purchases/memberships row is removed. The native modal exposes Ad Block,
+      SponsorBlock, category toggles, and the support QR.
+    </p>
+    <p>Settings are currently per-session. A native persisted config is planned.</p>
+
+    <h2>Update check</h2>
+    <p>
+      The proxy serves <code>/update</code> by fetching <code>version.json</code>
+      from the repository. The payload compares it with
+      <code>CURRENT_VERSION</code> and shows a toast when a newer version exists.
+    </p>
+
+    <h2>Limits</h2>
+    <ul>
+      <li>Tested only on firmware 8.20 with <code>PPSA01652</code>.</li>
+      <li>The <code>HTMLScriptExecute</code> signature is matched against the tested app build. A store update can change it.</li>
+      <li>The patch is memory-only and is cleared by a console reboot or app exit. The resident injector re-patches app launches; after a reboot, run the installer again or use autoload.</li>
+      <li>No app packages, console keys, DRM tools, or copyrighted files are distributed.</li>
+    </ul>
+
+    <p style="margin-top:28px">
+      <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/blob/main/docs/HOW_IT_WORKS.md">Source Markdown</a>
+      · <a href="testing.html">Testing notes</a>
+      · <a href="./#install">Install ytps5</a>
+    </p>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div><strong style="color:var(--text)">ytps5</strong> — unofficial runtime mod for the official PS5 video app.</div>
+      <div class="footer-links">
+        <a href="./">Home</a>
+        <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock">Repository</a>
+        <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest">Release</a>
+        <a href="testing.html">Testing</a>
+      </div>
+    </div>
+    <p class="trademark">
+      PlayStation is a trademark of Sony Interactive Entertainment Inc. YouTube is
+      a trademark of Google LLC. SponsorBlock is an independent community project.
+      ytps5 is an independent, unofficial project and is not affiliated with,
+      endorsed by, or sponsored by any of these companies or projects. No app
+      packages, console keys, DRM tools, or copyrighted files are distributed.
+    </p>
+  </div>
+</footer>
+</body>
+</html>

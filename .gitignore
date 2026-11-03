@@ -25,6 +25,8 @@ dist/
 *.jpg
 *.jpeg
 *.png
+# Website assets are the exception
+!docs/*.png
 
 # Generated direct-hook / embedded headers
 injector/direct_hook_blob.h

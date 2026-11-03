@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block YouTube ads on PS5 — ytps5 (unofficial, FW 8.20)</title>
+<meta name="description" content="Unofficial mod that filters YouTube ads and skips SponsorBlock in the official PS5 video app (FW 8.20). Free, open source; no app packages or keys.">
+<meta name="author" content="MasterShivnath007">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0b1220">
+<link rel="canonical" href="https://mastershivnath007.github.io/ytps5-sponsorblock/">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<!-- Google Search Console: paste your verification meta tag here, then remove this comment. -->
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ytps5">
+<meta property="og:title" content="Block YouTube ads on PS5 — ytps5 (unofficial)">
+<meta property="og:description" content="Ad filtering + SponsorBlock for the official PS5 video app on jailbroken FW 8.20. Free and open source; no app packages, keys, or DRM tools.">
+<meta property="og:url" content="https://mastershivnath007.github.io/ytps5-sponsorblock/">
+<meta property="og:image" content="https://mastershivnath007.github.io/ytps5-sponsorblock/social.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ytps5 — ad filtering and SponsorBlock for the official PS5 video app">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Block YouTube ads on PS5 — ytps5 (unofficial)">
+<meta name="twitter:description" content="Ad filtering + SponsorBlock for the official PS5 video app on jailbroken FW 8.20. Free and open source.">
+<meta name="twitter:image" content="https://mastershivnath007.github.io/ytps5-sponsorblock/social.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "ytps5",
+      "alternateName": "ytps5-sponsorblock",
+      "applicationCategory": "UtilitiesApplication",
+      "applicationSubCategory": "Console runtime mod",
+      "operatingSystem": "PlayStation 5 firmware 8.20",
+      "softwareVersion": "1.0.1",
+      "description": "An unofficial runtime mod that filters ads and skips SponsorBlock segments in the official PS5 video app on jailbroken firmware 8.20. It patches the running process in memory and distributes no app packages, console keys, DRM tools, or copyrighted files.",
+      "url": "https://mastershivnath007.github.io/ytps5-sponsorblock/",
+      "downloadUrl": "https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest",
+      "codeRepository": "https://github.com/MasterShivnath007/ytps5-sponsorblock",
+      "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+      "author": {
+        "@type": "Person",
+        "name": "MasterShivnath007",
+        "url": "https://github.com/MasterShivnath007"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I block YouTube ads on a PS5?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "On a jailbroken PS5, run ytps5.elf once with Payload Manager, then open the clean app PPSA01652. ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does ytps5 work on PS5 firmware 8.20?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Firmware 8.20 with PPSA01652 is the only tested combination. Other firmware or app builds are untested because the HTMLScriptExecute signature can differ."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need a jailbroken PS5?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. ytps5 attaches to the running app with libhijacker and patches the process in memory. It does not run on stock firmware."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is ytps5 free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It is GPL-3.0, with no paywalled features, account, or telemetry."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will ytps5 work on PPSA01650 or PPSA01651?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Those are commonly used as Y2JB daily drivers, and the tool deliberately refuses to patch them. Use a clean app such as PPSA01652."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does ytps5 support SponsorBlock?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. SponsorBlock segments are fetched from the public API through the local proxy and skipped with a toast. Categories can be toggled in ytps5 Settings."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="./" aria-label="ytps5 home">
+      <img src="icon.svg" alt="" width="26" height="26">
+      ytps5 <span>unofficial PS5 runtime mod</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#compatibility">Compatibility</a>
+      <a href="#install">Install</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav-cta" href="https://github.com/MasterShivnath007/ytps5-sponsorblock" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot" aria-hidden="true"></span><b>Unofficial</b> · FW 8.20 · PPSA01652</div>
+    <h1>Block YouTube ads and skip sponsor segments on the PS5.</h1>
+    <p class="lede">
+      ytps5 is a free, open-source runtime mod for the official PS5 video app on
+      jailbroken consoles. It filters in-player, feed and hero ads, skips
+      SponsorBlock segments, and adds a native settings panel — without
+      distributing app packages, console keys, DRM tools, or copyrighted files.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 12.5 3.5 8l1.4-1.4L7 8.7V1h2v7.7l2.1-2.1L12.5 8 8 12.5ZM2 14v-2h12v2H2Z"/></svg>
+        Download ytps5.elf
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/MasterShivnath007/ytps5-sponsorblock" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .5 9.9 6l5.6.2-4.5 3.4 1.7 5.4L8 11.7 3.3 15l1.7-5.4L.5 6.2 6.1 6 8 .5Z"/></svg>
+        Source on GitHub
+      </a>
+      <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+    </div>
+    <p class="hero-note">Memory-only patch · run once per boot · re-patches every app launch · GPL-3.0</p>
+
+    <div class="notice">
+      <strong>Research and educational project.</strong> Not affiliated with Sony,
+      Google, YouTube, or SponsorBlock. No app packages, console keys, DRM bypass
+      tools, or copyrighted content are distributed; you must already own the app.
+      Tested only on PS5 firmware 8.20 with the clean app <code>PPSA01652</code>.
+      Do not use this with the Y2JB apps <code>PPSA01650</code>/<code>PPSA01651</code>.
+      Use at your own risk; no warranty.
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">What it does</div>
+      <h2>Fewer interruptions. Native controls.</h2>
+      <p>Everything runs in the app's process memory. Nothing is written to the installed package, save data, or the Y2JB autoloader.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16v14H4z" stroke-linejoin="round"/><path d="m10 9 5 3-5 3V9Z" stroke-linejoin="round"/></svg></div>
+        <h3>In-player ad filtering</h3>
+        <p>Ad objects are removed before the player UI renders them, so playback starts on the video instead of an ad break.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/><path d="m17 16 2 2 3-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Feed and hero cleanup</h3>
+        <p>Sponsored cards in the home feed and hero shelf are filtered out, leaving the recommendations you actually asked for.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 4h14v16H5z" stroke-linejoin="round"/><path d="M9 9h6M9 13h6M9 17h3" stroke-linecap="round"/></svg></div>
+        <h3>SponsorBlock skipping</h3>
+        <p>Segments are fetched from the public SponsorBlock API through a local proxy and skipped automatically, with a toast on screen.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" stroke-linecap="round"/></svg></div>
+        <h3>Native settings panel</h3>
+        <p>The app's own settings screen gains a <strong>ytps5 Settings</strong> entry: Ad Block, SponsorBlock, and per-category toggles.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7" stroke-linecap="round"/><path d="M20 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Update checks</h3>
+        <p>A toast appears when a newer release is published. The check reads <code>version.json</code> from the repository through the local proxy.</p>
+      </article>
+      <article class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 4.5 6v6c0 4.4 3 7.5 7.5 9 4.5-1.5 7.5-4.6 7.5-9V6L12 3Z" stroke-linejoin="round"/><path d="m8.8 12 2.2 2.2 4.2-4.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Resident, memory-only</h3>
+        <p>Run the installer once per boot. The injector waits for the app, patches each launch, and clears completely when the console restarts.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="compatibility">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Compatibility</div>
+      <h2>One tested target. Everything else is marked.</h2>
+      <p>The injector checks the title before patching and refuses the Y2JB daily drivers on purpose.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">App</th><th scope="col">Role</th><th scope="col">Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>PPSA01650</code></td><td>Y2JB daily driver</td><td class="no">Never patch — the tool refuses</td></tr>
+          <tr><td><code>PPSA01651</code></td><td>Y2JB daily driver</td><td class="no">Never patch — the tool refuses</td></tr>
+          <tr><td><code>PPSA01652</code></td><td>Clean player</td><td class="yes">Recommended — tested on FW 8.20</td></tr>
+          <tr><td>other <code>PPSA0165x</code></td><td>Native PS5 app</td><td class="partial">Untested — signatures can differ</td></tr>
+          <tr><td><code>CUSA01116</code></td><td>PS4-compatibility app</td><td class="no">Unsupported</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Install</div>
+      <h2>One ELF. Six steps.</h2>
+      <p>The release is a single file that embeds the proxy and injector. It only uses loopback to hand them to the console's own <code>elfldr</code>.</p>
+    </div>
+    <ol class="steps">
+      <li><div><b>Download <code>ytps5.elf</code></b><p>Use the latest release on GitHub. Do not use a mirror or a reupload.</p></div></li>
+      <li><div><b>Copy it to the console or a USB drive</b><p>Any folder Payload Manager can read is fine.</p></div></li>
+      <li><div><b>Open Payload Manager → local payloads</b><p>Add or upload <code>ytps5.elf</code>, then run it.</p></div></li>
+      <li><div><b>Wait for the toast</b><p>You should see “ytps5: waiting for the supported app”.</p></div></li>
+      <li><div><b>Open the clean app <code>PPSA01652</code></b><p>The app freezes for a moment while the hook is installed, then shows “ytps5: hook installed”.</p></div></li>
+      <li><div><b>Optional: add it to autoload</b><p>Payload Manager: add <code>ytps5.elf</code> to <code>autoload.txt</code>. etaHEN: add it to the payload autoload list.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Under the hood</div>
+      <h2>A prologue patch, not a package mod.</h2>
+      <p>ytps5 attaches with libhijacker, installs a position-independent trampoline on <code>HTMLScriptExecute</code>, and prepends a JavaScript payload to scripts under 512 KB.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <h3>1. Attach and suspend</h3>
+        <p>The injector finds the clean app process and suspends it before touching executable memory.</p>
+      </article>
+      <article class="card">
+        <h3>2. Patch the prologue</h3>
+        <p>A 14-byte jump is installed at the <code>HTMLScriptExecute</code> entry, with a trampoline that runs the original instructions.</p>
+      </article>
+      <article class="card">
+        <h3>3. Resume and stay resident</h3>
+        <p>The payload runs in the page context. When the app closes, the injector waits for the next launch and patches it again.</p>
+      </article>
+    </div>
+    <p style="margin-top:18px"><a href="how-it-works.html">Read the full technical write-up →</a></p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">FAQ</div>
+      <h2>Common questions.</h2>
+      <p>Short answers. The repository has the full disclaimer and troubleshooting notes.</p>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>How do I block YouTube ads on a PS5?</summary>
+        <div class="answer"><p>On a jailbroken PS5, run <code>ytps5.elf</code> once with Payload Manager, then open the clean app <code>PPSA01652</code>. ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package.</p></div>
+      </details>
+      <details>
+        <summary>Does ytps5 work on PS5 firmware 8.20?</summary>
+        <div class="answer"><p>Firmware 8.20 with <code>PPSA01652</code> is the only tested combination. Other firmware or app builds are untested because the <code>HTMLScriptExecute</code> signature can differ.</p></div>
+      </details>
+      <details>
+        <summary>Do I need a jailbroken PS5?</summary>
+        <div class="answer"><p>Yes. ytps5 attaches to the running app with libhijacker and patches the process in memory. It does not run on stock firmware.</p></div>
+      </details>
+      <details>
+        <summary>Is ytps5 free?</summary>
+        <div class="answer"><p>Yes. It is GPL-3.0, with no paywalled features, account, or telemetry. GitHub Sponsors is optional and does not change the license.</p></div>
+      </details>
+      <details>
+        <summary>Will it work on PPSA01650 or PPSA01651?</summary>
+        <div class="answer"><p>No. Those are commonly used as Y2JB daily drivers, and the tool deliberately refuses to patch them. Use a clean app such as <code>PPSA01652</code>.</p></div>
+      </details>
+      <details>
+        <summary>Does it support SponsorBlock?</summary>
+        <div class="answer"><p>Yes. SponsorBlock segments are fetched from the public API through the local proxy and skipped with a toast. Categories can be toggled in ytps5 Settings.</p></div>
+      </details>
+      <details>
+        <summary>Can I use it on a PS4 or PS5 Pro?</summary>
+        <div class="answer"><p>It targets the native PS5 app on FW 8.20. PS4-compatibility titles such as <code>CUSA01116</code> and untested hardware are unsupported.</p></div>
+      </details>
+      <details>
+        <summary>How do I uninstall it?</summary>
+        <div class="answer"><p>Reboot the console, or close the app. The patch is memory-only and is not written to the app, save data, or <code>download0.dat</code>.</p></div>
+      </details>
+      <details>
+        <summary>Where are the logs?</summary>
+        <div class="answer"><p><code>/data/ytps5-sponsorblock/</code> contains <code>relay.log</code>, <code>injector.log</code>, and <code>proxy_server.log</code>. Attach them to bug reports with your firmware and title ID.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="legal">
+  <div class="wrap">
+    <div class="legal">
+      <div class="kicker">Legal and safety</div>
+      <h2>What this project is — and is not</h2>
+      <ul>
+        <li>This project contains <strong>no</strong> app packages, console keys, DRM bypass tooling, or copyrighted app files.</li>
+        <li>It does not modify the installed app package. The patch exists only in the running process's memory and disappears when the app or console restarts.</li>
+        <li>It is intended for research, education, and personal use on hardware you own and control. Check the laws and terms that apply to you.</li>
+        <li>The tool deliberately refuses <code>PPSA01650</code> and <code>PPSA01651</code> because those are commonly used as Y2JB daily drivers.</li>
+        <li>SponsorBlock is an independent community service. This project only calls its public API.</li>
+        <li>Not affiliated with Sony, Google, YouTube, SponsorBlock, or any app vendor. No warranty; use at your own risk.</li>
+      </ul>
+      <p style="margin:16px 0 0"><a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/blob/main/DISCLAIMER.md">Read the full disclaimer</a> · <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/blob/main/TRADEMARKS.md">Trademark notes</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <strong style="color:var(--text)">ytps5</strong> — unofficial runtime mod for the official PS5 video app.
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock">Repository</a>
+        <a href="https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest">Release</a>
+        <a href="testing.html">Testing</a>
+        <a href="https://github.com/sponsors/MasterShivnath007">Sponsor</a>
+      </div>
+    </div>
+    <p class="trademark">
+      PlayStation is a trademark of Sony Interactive Entertainment Inc. YouTube is
+      a trademark of Google LLC. SponsorBlock is an independent community project.
+      ytps5 is an independent, unofficial project and is not affiliated with,
+      endorsed by, or sponsored by any of these companies or projects. No app
+      packages, console keys, DRM tools, or copyrighted files are distributed.
+    </p>
+  </div>
+</footer>
+</body>
+</html>

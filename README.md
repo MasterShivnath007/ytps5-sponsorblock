@@ -1,5 +1,11 @@
 # ytps5
 
+[![Release](https://img.shields.io/github/v/release/MasterShivnath007/ytps5-sponsorblock?color=orange)](https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![Firmware: 8.20](https://img.shields.io/badge/firmware-8.20-black.svg)](#compatibility)
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github)](https://github.com/sponsors/MasterShivnath007)
+[![Donate](https://img.shields.io/badge/Donate-Razorpay-02042B?logo=razorpay)](https://rzp.io/rzp/gkf8SP9)
+
 **A runtime quality-of-life mod for the official PS5 video app on jailbroken consoles.**
 
 It adds ad filtering, SponsorBlock skipping, and a native settings panel with
@@ -161,7 +167,56 @@ header automatically.
 
 See `docs/HOW_IT_WORKS.md` for details.
 
+## Credits and prior art
+
+`ytps5` builds on the PS5 homebrew ecosystem and on earlier Cobalt ad-skip
+projects. Full details and license notes are in **[CREDITS.md](CREDITS.md)**;
+the prior-art review is in **[RESEARCH.md](RESEARCH.md)**.
+
+- **etaHEN-Plugins / libhijacker** — GPL-3.0, vendored headers, source, and
+  archive.
+- **PS5 payload SDK** — GPL-3.0+, compiler and stub libraries.
+- **HDE64** — BSD-style instruction decoder.
+- **[yt_adskip_ps4](https://github.com/earthonion/yt_adskip_ps4)** — prior PS4
+  Cobalt ad-skip plugin. No code copied; cited as prior art.
+- **[TizenTube](https://github.com/reisxd/TizenTube)** and
+  **[TizenTubeCobalt](https://github.com/reisxd/TizenTubeCobalt)** — settings
+  and SponsorBlock UX references. The native settings modal/QR renderer shapes
+  are adapted from TizenTube's GPL-3.0 UI helpers; this project is also GPL-3.0.
+- **[MuTube](https://github.com/Exaphis/mutube)** — Apple TV wrapper, studied as
+  a reference. No code copied.
+- **[Tube5-PS5](https://github.com/MrDerekib/Tube5-PS5)** — related native PS5
+  client; no code used.
+- **SponsorBlock** — independent public API/service, not affiliated.
+
+At the time of the 1.0.1 release, no public project was found that patches the
+official PS5 app at runtime with an ELF payload. If earlier work exists, open an
+issue so it can be credited.
+
+## Support the project
+
+`ytps5` is free and GPL-3.0. If it saved you time:
+
+- **[Sponsor monthly on GitHub](https://github.com/sponsors/MasterShivnath007)** —
+  monthly or one-time support.
+- **[Donate one-time via Razorpay](https://rzp.io/rzp/gkf8SP9)** — UPI, Indian
+  cards, and netbanking.
+- **Star and share** the repository or the latest release.
+
+There is no paywalled feature, telemetry, or mandatory account. See
+**[SUPPORT.md](SUPPORT.md)** for the full support policy.
+
+## Roadmap
+
+- Persist Ad Block / SponsorBlock preferences across app restarts.
+- More detailed settings (per-category controls, playback options, proxy status).
+- Investigate the occasional 4–5 video startup delay.
+- Keep the `HTMLScriptExecute` signature current for future app updates.
+
 ## Legal and safety
+
+Read **[DISCLAIMER.md](DISCLAIMER.md)** and **[TRADEMARKS.md](TRADEMARKS.md)**.
+In short:
 
 - This repository contains **no** app packages, console keys, DRM bypass
   tooling, or copyrighted app files.

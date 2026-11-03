@@ -3,6 +3,11 @@
 This project is licensed under **GPL-3.0**. It includes or links the following
 third-party components. Their licenses apply to their respective files.
 
+See **[CREDITS.md](CREDITS.md)** for complete credits and prior art, and
+**[RESEARCH.md](RESEARCH.md)** for the public-project review. The settings
+modal/QR renderer shapes are adapted from TizenTube's GPL-3.0 UI helpers; this
+project is also GPL-3.0.
+
 ## etaHEN / etaHEN-Plugins
 
 - Vendored: `third_party/etahen/include`, `third_party/etahen/libhijacker/source`,
@@ -28,7 +33,7 @@ libraries.
 
 - Vendored: `module/hde64.cpp`, `module/hde64.h`, `module/table64.h`.
 - Copyright (c) 2008-2009 Vyacheslav Patkov.
-- BSD-style license. Used to calculate instruction boundaries.
+- BSD-style license; full text in `LICENSES/hde64.txt`. Used to calculate instruction boundaries.
 
 ## References and prior art
 
@@ -58,7 +63,7 @@ The local proxy is statically linked with:
 - **zstd** — <https://github.com/facebook/zstd> (BSD-3-Clause)
 
 These are build dependencies from the PS5 payload SDK's userland; they are
-linked into the released installer.
+linked into the released installer. Full license texts are in `LICENSES/`.
 
 ## Build tools
 

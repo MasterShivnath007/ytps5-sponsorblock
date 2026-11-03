@@ -138,7 +138,7 @@ dump: $(BUILD)/ytps5-dump.elf
 dist: all
 	@mkdir -p dist
 	@cp $(BUILD)/ytps5-installer.elf dist/ytps5.elf
-	@cp README.md LICENSE THIRD_PARTY_NOTICES.md version.json dist/
+	@cp README.md LICENSE THIRD_PARTY_NOTICES.md CREDITS.md DISCLAIMER.md TRADEMARKS.md SUPPORT.md DONATIONS.md RESEARCH.md version.json dist/
 	@cp -R LICENSES dist//
 	@cp tools/ytps5.py tools/run_test.sh dist/tools/
 	@cp README.md LICENSE THIRD_PARTY_NOTICES.md dist/

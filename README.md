@@ -4,7 +4,6 @@
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 [![Firmware: 8.20](https://img.shields.io/badge/firmware-8.20-black.svg)](#compatibility)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github)](https://github.com/sponsors/MasterShivnath007)
-[![Donate](https://img.shields.io/badge/Donate-Razorpay-02042B?logo=razorpay)](https://rzp.io/rzp/gkf8SP9)
 
 **A runtime quality-of-life mod for the official PS5 video app on jailbroken consoles.**
 
@@ -199,8 +198,8 @@ issue so it can be credited.
 
 - **[Sponsor monthly on GitHub](https://github.com/sponsors/MasterShivnath007)** —
   monthly or one-time support.
-- **[Donate one-time via Razorpay](https://rzp.io/rzp/gkf8SP9)** — UPI, Indian
-  cards, and netbanking.
+- One-time Razorpay support is temporarily paused while the payment page is
+  sanitised. GitHub Sponsors is available.
 - **Star and share** the repository or the latest release.
 
 There is no paywalled feature, telemetry, or mandatory account. See

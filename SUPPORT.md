@@ -21,8 +21,8 @@ hardware, documentation, and the unglamorous bug triage.
 
 - **[Sponsor monthly on GitHub](https://github.com/sponsors/MasterShivnath007)** —
   monthly or one-time support through GitHub Sponsors.
-- **[Donate one-time via Razorpay](https://rzp.io/rzp/gkf8SP9)** — UPI, Indian
-  cards, and netbanking.
+- One-time Razorpay support is temporarily paused while the payment page is
+  sanitised. GitHub Sponsors is available.
 
 Sponsorship is optional and does not change the GPL-3.0 license or the public
 nature of the code.

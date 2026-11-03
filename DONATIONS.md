@@ -1,11 +1,11 @@
 # Donation and sponsorship
 
-There are two rails, both optional:
+**GitHub Sponsors** is the public rail: recurring or one-time, international,
+and built into the repository. <https://github.com/sponsors/MasterShivnath007>
 
-1. **GitHub Sponsors** — recurring or one-time, international, built into the
-   repository. <https://github.com/sponsors/MasterShivnath007>
-2. **Razorpay** — one-time Indian payments (UPI, cards, netbanking).
-   <https://rzp.io/rzp/gkf8SP9>
+One-time Razorpay support is temporarily paused while the payment page is
+sanitised. Do not share a Razorpay link until its public page no longer exposes
+personal contact or registered-address details.
 
 The in-app **Support master_shivnath** QR points to the GitHub Sponsors page.
 The repository Sponsor button is configured in `.github/FUNDING.yml`.

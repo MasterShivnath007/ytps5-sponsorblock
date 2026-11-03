@@ -94,9 +94,9 @@ roadmap for the next update.
 
 ```json
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "url": "https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest",
-  "notes": "Initial public release"
+  "notes": "Update mirror fallback and latest fixes"
 }
 ```
 

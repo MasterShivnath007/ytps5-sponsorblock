@@ -26,7 +26,7 @@
   var origParse = JSON.parse;
 
   var AUTHOR_NAME = 'master_shivnath';
-  var CURRENT_VERSION = '1.0.0';
+  var CURRENT_VERSION = '1.0.1';
   var UPDATE_CHECK_URL = 'http://127.0.0.1:4040/update';
   var REPO_URL = 'https://github.com/MasterShivnath007/ytps5-sponsorblock';
   var DONATE_URL = 'https://github.com/sponsors/MasterShivnath007';

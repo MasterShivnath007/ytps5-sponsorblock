@@ -25,8 +25,11 @@
 #define SRV_LOG "/data/ytps5-sponsorblock/proxy_server.log"
 #define MAX_BODY (4 * 1024 * 1024)
 
-#define UPDATE_URL \
-  "https://raw.githubusercontent.com/MasterShivnath007/ytps5-sponsorblock/main/version.json"
+static const char *UPDATE_URLS[] = {
+  "https://cdn.jsdelivr.net/gh/MasterShivnath007/ytps5-sponsorblock@main/version.json",
+  "https://raw.githubusercontent.com/MasterShivnath007/ytps5-sponsorblock/main/version.json",
+};
+#define UPDATE_URL_COUNT (sizeof(UPDATE_URLS) / sizeof(UPDATE_URLS[0]))
 #define API_PREFIX "https://sponsor.ajay.app/api/skipSegments?videoID="
 #define API_SUFFIX \
   "&categories=%5B%22sponsor%22%2C%22intro%22%2C%22outro%22%2C%22interaction%22%2C%22selfpromo%22%2C%22preview%22%2C%22filler%22%2C%22music_offtopic%22%5D"
@@ -150,34 +153,43 @@ static void fetch_update(Buffer *out) {
     return;
   }
 
-  CURL *curl = curl_easy_init();
-  if (!curl) return;
-  curl_easy_setopt(curl, CURLOPT_URL, UPDATE_URL);
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, out);
-  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3L);
-  curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5L);
-  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "ytps5-sponsorblock/1.0");
+  for (size_t i = 0; i < UPDATE_URL_COUNT; i++) {
+    CURL *curl = curl_easy_init();
+    if (!curl) return;
+    curl_easy_setopt(curl, CURLOPT_URL, UPDATE_URLS[i]);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, out);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 3L);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 6L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "ytps5-sponsorblock/1.0");
 
-  CURLcode rc = curl_easy_perform(curl);
-  long status = 0;
-  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
-  curl_easy_cleanup(curl);
+    CURLcode rc = curl_easy_perform(curl);
+    long status = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+    curl_easy_cleanup(curl);
 
-  if (rc != CURLE_OK || status != 200 || out->len == 0) {
-    set_empty(out);
-    logf_("update check failed (curl=%d http=%ld)", (int)rc, status);
-    return;
+    if (rc == CURLE_OK && status == 200 && out->len > 0) {
+      if (out->len < sizeof(g_update_cache)) {
+        memcpy(g_update_cache, out->data, out->len);
+        g_update_len = out->len;
+        g_update_time = now;
+      }
+      logf_("update check %zu bytes (http=%ld, url=%zu)", out->len, status, i);
+      return;
+    }
+
+    logf_("update url %zu failed (curl=%d http=%ld)", i, (int)rc, status);
+    if (out->owned && out->data) free(out->data);
+    out->data = NULL;
+    out->len = 0;
+    out->owned = 0;
   }
-  if (out->len < sizeof(g_update_cache)) {
-    memcpy(g_update_cache, out->data, out->len);
-    g_update_len = out->len;
-    g_update_time = now;
-  }
-  logf_("update check %zu bytes (http=%ld)", out->len, status);
+
+  set_empty(out);
+  logf_("update check: all mirrors failed");
 }
 
 static int is_video_id(const char *path) {

@@ -1,114 +1,63 @@
-# Testing on the console
+# Testing
 
-Tested target: PS5 firmware 8.20, Y2JB + Relapse, etaHEN with FTP on 2121 and
-elfldr on 9021. The injector itself is firmware-independent; it uses libhijacker.
+Test target: **PS5 firmware 8.20**, Y2JB + Relapse, etaHEN with FTP on `2121`
+and `elfldr` on `9021`, clean app **`PPSA01652`**.
 
-## 1. Prepare the console
+Do **not** test on `PPSA01650`/`PPSA01651`; those are Y2JB daily drivers and the
+injector deliberately refuses them.
 
-1. Boot the PS5 and let the jailbreak + etaHEN finish.
-2. Confirm FTP works:
-
-   ```bash
-   python3 - <<'PY'
-   from ftplib import FTP
-   ftp = FTP(); ftp.connect("<PS5_IP>", 2121, timeout=10)
-   ftp.login("anonymous", "anonymous")
-   print(ftp.pwd())
-   ftp.quit()
-   PY
-   ```
-
-3. Confirm the official YouTube app is installed. The injector accepts
-   `PPSA01650`, `PPSA01651` and `PPSA01652`.
-
-## 2. Build (or use the release ZIP)
+## Build
 
 ```bash
 export PS5_PAYLOAD_SDK=/opt/ps5-payload-sdk
 export LLVM_CONFIG=/opt/homebrew/opt/llvm@18/bin/llvm-config
-make
+make minify
+make installer
 ```
 
-You should get `build/ytps5-injector.elf` and `build/sponsorblock.so`.
+`build/ytps5-installer.elf` is the single file to upload.
 
-## 3. Send it
+## Install
+
+1. Upload `ytps5-installer.elf` in Payload Manager (or place it in the local
+   payloads folder) and run it.
+2. Confirm the toast **“ytps5: waiting for the supported app”**.
+3. Open `PPSA01652`.
+4. Expect a short freeze, then **“ytps5: hook installed”** and
+   **“N script(s) injected”**.
+
+## Checklist
+
+- [ ] App launches to the home screen.
+- [ ] No in-player ads play.
+- [ ] Feed/hero sponsored cards are gone.
+- [ ] Settings → **ytps5 Settings** opens.
+- [ ] Ad Block / SponsorBlock / category toggles work.
+- [ ] **Support master_shivnath** opens the QR panel.
+- [ ] SponsorBlock finds and skips a known segment.
+- [ ] Close and reopen the app; it is patched automatically without rerunning
+      the installer.
+- [ ] Run the installer on a clean boot; it starts the proxy and injector.
+
+## Logs
 
 ```bash
-python3 tools/ytps5.py send --host <PS5_IP> --wait 30
-```
-
-Expected helper output:
-
-```
-uploaded sponsorblock.so -> /data/ytps5-sponsorblock/sponsorblock.so (...)
-uploaded inject.js -> /data/ytps5-sponsorblock/inject.js (...)
-uploaded ytps5-injector.elf -> /data/ytps5-sponsorblock/ytps5-injector.elf (...)
-sending ytps5-injector.elf (...) to <PS5_IP>:9021 ...
-ELF sent
-waiting 30s ...
-```
-
-Then launch YouTube. The injector waits for it, so you can launch it after
-sending the ELF.
-
-## 4. What you should see
-
-- A toast: `Ad Block + SponsorBlock Enabled!`
-- Open a video that has sponsor segments. The toast `SponsorBlock: N segment(s)
-  found` should appear, then `Segment Skipped` when the segment starts.
-- Ads should not play before/inside videos.
-
-## 5. If nothing happens
-
-Run:
-
-```bash
-python3 tools/ytps5.py clean-logs --host <PS5_IP>
-python3 tools/ytps5.py send --host <PS5_IP> --wait 30
 python3 tools/ytps5.py logs --host <PS5_IP> --save
 ```
 
-`logs/` will contain:
+Or read from the console:
 
-- `data_ytps5-sponsorblock_injector.log`
-- `data_ytps5-sponsorblock_ytps5.log`
-- `sandbox_..._hui_dev_yt.log` (Cobalt's own log, read-only)
+- `/data/ytps5-sponsorblock/relay.log`
+- `/data/ytps5-sponsorblock/injector.log`
+- `/data/ytps5-sponsorblock/proxy_server.log`
 
-Open an issue and attach those files plus:
+Expected injector stages include `app suspended`, `kernel_mprotect`, `installed
+target`, `resumed`, and `calls=... injected=...`.
 
-- PS5 firmware
-- YouTube version (the app's version, e.g. `01.000.003`)
-- Whether the ELF was sent before or after launching YouTube
-- What you saw (toast, crash, black screen, no change)
+## Failure notes
 
-### Common log lines
-
-| Log line | Meaning |
-|---|---|
-| `found YouTube title=... pid=...` | The injector found the app. |
-| `scePadReadState=... GOT=...` | The PLT/GOT patch target was found. |
-| `hooked scePadReadState GOT ...` | The loader is installed. |
-| `module install start` | `sponsorblock.so` was loaded into the app. |
-| `HTMLScriptExecute candidate at ...` | The Cobalt hook target was found. |
-| `[inject] context=...` | The JS payload was injected into a Cobalt context. |
-| `HTMLScriptExecute not found` | The signature needs updating for this app version. |
-| `kernel_mprotect(...) -> ...` | Whether the app's code page was made writable. |
-
-## 6. Repeat tests
-
-The GOT patch remains until YouTube is restarted. To re-test:
-
-1. Close YouTube completely.
-2. `clean-logs`.
-3. `send` again.
-4. Launch YouTube.
-
-If the app is already patched, sending the injector again will see the GOT slot
-already pointing at the old hook and may re-patch it. Closing YouTube is the
-clean way.
-
-## 7. Uninstall
-
-Close YouTube and reboot the console. The patch only lives in the running
-process; nothing is installed into the app. You can also delete
-`/data/ytps5-sponsorblock/` over FTP.
+- **Stuck launch screen:** reboot and rerun the installer. Verify the app is the
+  tested build and that you did not try to patch a Y2JB app.
+- **No SponsorBlock:** check that the proxy is listening (`curl
+  http://<PS5_IP>:4040/ping` from the same network should return `[]`).
+- **No update toast:** confirm `version.json` exists on `main`.

@@ -154,7 +154,7 @@ def cmd_logs(args: argparse.Namespace) -> None:
             "no logs found. Check that:\n"
             "  - etaHEN FTP is running on port 2121\n"
             "  - the injector ran at least once\n"
-            "  - YouTube has been started after the injector was sent"
+            "  - The app has been started after the injector was sent"
         )
 
 

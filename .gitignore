@@ -1,4 +1,4 @@
-# Retail YouTube PKGs / test data (never commit)
+# Retail app packages / test data (never commit)
 3YOUTUBE-PS5/
 *.pkg
 *.PKG
@@ -18,3 +18,14 @@ module/payload_js.h
 # Local release artifacts
 dist/
 *.zip
+
+# Personal screenshots / media (never commit)
+*.heic
+*.HEIC
+*.jpg
+*.jpeg
+*.png
+
+# Generated direct-hook / embedded headers
+injector/direct_hook_blob.h
+injector/embedded_blobs.h

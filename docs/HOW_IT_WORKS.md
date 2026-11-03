@@ -1,90 +1,66 @@
 # How it works
 
-## The short version
+This is a runtime patch for the official PS5 video app. It does not modify the
+installed app package, does not use console keys, and does not distribute any
+app files.
 
-The PS5 YouTube app is a Cobalt application. Cobalt is a Chromium-derived
-browser that runs YouTube's TV web app. The app's executable is a normal
-x86-64 module; its UI is JavaScript running inside Cobalt.
+## Components
 
-We cannot patch the retail PKG because it is encrypted and signed. We can,
-however, patch the running process:
+- `ytps5.elf` — the single-file installer. It embeds the proxy and injector and
+  hands both to the console's own `elfldr` on `127.0.0.1:9021`.
+- Proxy (`injector/dump_server.c`) — a small local HTTP service on port `4040`.
+  It fetches SponsorBlock data (and `version.json`) over HTTPS.
+- Injector (`injector/main.cpp`) — attaches to the clean app process, finds
+  `HTMLScriptExecute`, installs a trampoline and hook, and stays resident.
+- Hook (`injector/direct_hook.c`) — a tiny position-independent blob that
+  prepends the JavaScript payload to each script.
+- Payload (`payload/inject.src.js`, minified to `payload/inject.js`) — ad
+  filtering, SponsorBlock skipping, the settings panel, and update checks.
 
-1. `ytps5-injector.elf` attaches to the YouTube process with libhijacker.
-2. It finds the app's `scePadReadState` import in the executable's PLT/GOT and
-   points that GOT slot at a small code blob.
-3. The next time the app polls the controller, the blob runs. It calls
-   `dlopen("/data/ytps5-sponsorblock/sponsorblock.so")`, resolves
-   `ytps5_install`, and calls it.
-4. `sponsorblock.so` hooks Cobalt's `HTMLScriptExecute`.
-5. The first script in each Cobalt context is replaced with:
+## Flow
+
+1. The installer sends the proxy and injector to `elfldr`.
+2. The injector waits for a `PPSA0165x` app. It refuses `PPSA01650`/`PPSA01651`
+   (Y2JB daily drivers) and waits for a clean title.
+3. It attaches with libhijacker, finds `HTMLScriptExecute`, and makes the target
+   page writable from the kernel side.
+4. It installs a `scePadRead` GOT trigger. On the next controller poll, the
+   trigger applies the `HTMLScriptExecute` prologue patch from inside the app's
+   own input loop, avoiding a race with a live script call.
+5. The `HTMLScriptExecute` hook calls a trampoline containing the original
+   prologue, then calls the original function with a combined string:
 
    ```
    <our JavaScript payload>
    <the original script>
    ```
 
-   so the app still runs normally.
-6. The payload prunes ad objects from `JSON.parse` results and skips
-   SponsorBlock segments through the page's `<video>` element.
+6. The JavaScript runs in the page context and is idempotent. It filters ad
+   objects from API responses, watches the video element, fetches SponsorBlock
+   segments through the local proxy, and skips matching segments.
+7. The injector stays resident. When the app closes, it waits for the next
+   launch and patches the new process.
 
-## Why the GOT route?
+## Settings
 
-`scePadReadState` is imported by the YouTube executable and is called
-regularly. Patching its GOT slot is safer than overwriting the function's
-prologue:
+The app's settings response is patched lazily, only when the settings screen is
+opened. The “Premium” row becomes “ytps5 Settings”; the purchases/memberships
+row is removed. The native modal exposes Ad Block, SponsorBlock, category
+toggles, and the support QR.
 
-- The GOT entry is writable data, so no instruction-boundary disassembly is
-  needed in the injector.
-- The original function is still available at its real address, and our blob
-  calls it normally.
-- libhijacker's `Game_Plugin_Loader` uses the same technique for its shellcode.
+Settings are currently per-session. A native persisted config is planned.
 
-The blob is compiled from `injector/hook.c` with no external references, then
-copied into the executable's text allocator. A copy of the structure it needs
-is written to the target's data allocator.
+## Update check
 
-## Why the HTMLScriptExecute route?
+The proxy serves `/update` by fetching `version.json` from this repository. The
+payload compares it with `CURRENT_VERSION` and shows a toast when a newer
+version exists.
 
-The PS4 project (`earthonion/yt_adskip_ps4`) showed that Cobalt exposes a
-function that receives a script object and an "external" flag. The function is
-found by pattern-scanning the executable's text for a sequence from the Cobalt
-build:
+## Limits
 
-```
-55 48 89 E5 41 57 41 56 41 55 41 54 53 48 81 EC ...
-```
-
-The PS5 app may compile Cobalt differently. The injector tries the exact PS4
-signature first, then a version with wildcards, then a broader prologue. If none
-match, the module's fallback scans `/proc/curproc/map`. The logs record every
-candidate and the module it was found in.
-
-## Script object layout
-
-Cobalt passes something like a `std::string`-like object. The module probes the
-object for a `{pointer, size, capacity}` triple, learns the field offsets, and
-then builds a fresh copy of the header with our combined script. This is
-deliberately defensive: it does not assume a fixed layout until it has read a
-real object.
-
-## SponsorBlock data
-
-The JS payload calls:
-
-```
-https://sponsor.ajay.app/api/skipSegments?videoID=...&categories=[...]
-```
-
-The API returns segments. If Cobalt's CSP blocks direct `fetch`, the payload
-tries `http://127.0.0.1:4040/<videoID>` (the PS4 plugin's local proxy
-convention). The native proxy is not part of this first test build; it can be
-added to `sponsorblock.so` later if the direct request is blocked.
-
-## What this project does not do
-
-- It does not decrypt or modify `PPSA01650.pkg`, `PPSA01651.pkg` or
-  `PPSA01652.pkg`.
-- It does not include or download Sony/Google code, keys or licenses.
-- It does not bypass account checks, DRM or PSN.
-- It does not modify the installed app on disk; a reboot restores the original
-  process state.
+- Tested only on firmware 8.20 with `PPSA01652`.
+- The `HTMLScriptExecute` signature is matched against the tested app build.
+  A store update can change it.
+- The patch is memory-only and is cleared by a console reboot or app exit. The
+  resident injector re-patches app launches; after a reboot, run the installer
+  again or use autoload.

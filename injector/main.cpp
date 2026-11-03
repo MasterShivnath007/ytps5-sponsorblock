@@ -51,7 +51,26 @@ static void logf(const char *fmt, ...) {
   if (g_log) {
     fprintf(g_log, "%s\n", buf);
     fflush(g_log);
+    /* Make the last line survive a kernel panic or hard power-off. */
+    fsync(fileno(g_log));
   }
+}
+
+static bool g_probe = false;
+static bool g_no_jailbreak = false;
+static bool g_no_suspend = false;
+
+static void load_options() {
+  FILE *fp = fopen(LOG_DIR "/options.txt", "r");
+  if (!fp) return;
+  char line[128];
+  while (fgets(line, sizeof(line), fp)) {
+    int value = atoi(line + (strchr(line, '=') ? strchr(line, '=') - line + 1 : 0));
+    if (strncmp(line, "probe", 5) == 0) g_probe = value != 0;
+    else if (strncmp(line, "no_jailbreak", 12) == 0) g_no_jailbreak = value != 0;
+    else if (strncmp(line, "no_suspend", 10) == 0) g_no_suspend = value != 0;
+  }
+  fclose(fp);
 }
 
 extern "C" {
@@ -247,12 +266,15 @@ static uint64_t find_html_execute(Hijacker *h, std::string &where) {
 
 int main() {
   log_open();
+  load_options();
 
   payload_args_t *args = payload_get_args();
   kernel_base = args->kdata_base_addr;
 
   logf("ytps5 injector starting (pid=%d kernel_base=%p)", getpid(),
        (void *)kernel_base);
+  logf("options probe=%d no_jailbreak=%d no_suspend=%d", g_probe,
+       g_no_jailbreak, g_no_suspend);
 
   int pid = -1;
   int appid = -1;
@@ -280,16 +302,33 @@ int main() {
     return 2;
   }
 
-  hijacker->jailbreak(true);
-  logf("attached; suspending app");
-  sceKernelPrepareToSuspendProcess(pid);
-  sceKernelSuspendProcess(pid);
+  bool suspended = false;
+  auto resume_app = [&]() {
+    if (suspended) {
+      hijacker->resume();
+      suspended = false;
+      logf("[stage] resumed");
+    }
+  };
+
+  if (g_no_jailbreak) {
+    logf("[stage] jailbreak skipped");
+  } else {
+    hijacker->jailbreak(true);
+    logf("[stage] jailbreak done");
+  }
+  if (g_no_suspend) {
+    logf("[stage] suspend skipped");
+  } else {
+    hijacker->suspend();
+    suspended = true;
+    logf("[stage] suspended (dbg)");
+  }
 
   auto pad = hijacker->getLib("libScePad.sprx");
   if (!pad) {
     logf("libScePad.sprx not found");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 3;
   }
 
@@ -297,16 +336,14 @@ int main() {
       hijacker->getFunctionAddress(pad.get(), nid::scePadReadState);
   if (!pad_addr) {
     logf("scePadReadState not found");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 4;
   }
 
   auto libkernel = hijacker->getLibKernel();
   if (!libkernel) {
     logf("libkernel not found");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 5;
   }
   uintptr_t dlopen_addr =
@@ -319,8 +356,7 @@ int main() {
        (void *)dlopen_addr, (void *)dlsym_addr, (void *)debug_out_addr);
   if (!dlopen_addr || !dlsym_addr) {
     logf("dlopen/dlsym not resolved");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 5;
   }
 
@@ -337,22 +373,41 @@ int main() {
   logf("HTMLScriptExecute=%p (%s)", (void *)html_execute,
        where.empty() ? "not found" : where.c_str());
 
+  if (html_execute) {
+    uint8_t prologue[32] = {0};
+    char hex[sizeof(prologue) * 3 + 1] = {0};
+    if (hijacker->read(html_execute, prologue, sizeof(prologue))) {
+      for (size_t i = 0; i < sizeof(prologue); ++i) {
+        snprintf(hex + i * 3, 4, "%02x ", prologue[i]);
+      }
+      logf("HTMLScriptExecute prologue: %s", hex);
+    } else {
+      logf("could not read HTMLScriptExecute prologue");
+    }
+  }
+
+  if (g_probe) {
+    logf("[stage] probe stop (no writes performed)");
+    resume_app();
+    return 0;
+  }
+
   int target_writable = 0;
   if (html_execute) {
     const uintptr_t page = 0x1000;
     uintptr_t start = html_execute & ~(page - 1);
-    int rc = kernel_mprotect(pid, (intptr_t)start, 0x8000,
+    uintptr_t end = (html_execute + 16 + page - 1) & ~(page - 1);
+    int rc = kernel_mprotect(pid, (intptr_t)start, end - start,
                              PROT_READ | PROT_WRITE | PROT_EXEC);
     target_writable = (rc == 0);
-    logf("kernel_mprotect(%p) -> %d (writable=%d)", (void *)start, rc,
-         target_writable);
+    logf("kernel_mprotect(%p, 0x%zx) -> %d (writable=%d)", (void *)start,
+         (size_t)(end - start), rc, target_writable);
   }
 
   auto eboot = hijacker->getEboot();
   if (!eboot) {
     logf("eboot not found");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 6;
   }
 
@@ -385,8 +440,7 @@ int main() {
   }
   if (!got_addr) {
     logf("scePadReadState PLT entry not found");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 8;
   }
   logf("scePadReadState=%p GOT=%p", (void *)pad_addr, (void *)got_addr);
@@ -396,8 +450,7 @@ int main() {
       hijacker->getTextAllocator().allocate(ytps5_hook_blob_len + 16);
   if (!data_addr || !hook_addr) {
     logf("target allocation failed");
-    sceKernelPrepareToResumeProcess(pid);
-    sceKernelResumeProcess(pid);
+    resume_app();
     return 9;
   }
 
@@ -420,15 +473,15 @@ int main() {
 
   hijacker->write(data_addr, &stuff, sizeof(stuff));
   hijacker->write(hook_addr, ytps5_hook_blob, ytps5_hook_blob_len);
+  logf("[stage] hook blob written, patching GOT");
   hijacker->write<uintptr_t>(got_addr, hook_addr);
 
   logf("hooked scePadReadState GOT %p -> %p (stuff=%p)",
        (void *)got_addr, (void *)hook_addr, (void *)data_addr);
 
   usleep(1000);
-  sceKernelPrepareToResumeProcess(pid);
-  sceKernelResumeProcess(pid);
-  logf("app resumed; watching module status");
+  resume_app();
+  logf("[stage] app resumed; watching module status");
 
   int last_status = -1;
   for (int i = 0; i < 15; ++i) {

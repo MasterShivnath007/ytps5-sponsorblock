@@ -167,6 +167,12 @@ def cmd_clean_logs(args: argparse.Namespace) -> None:
                 print(f"deleted {remote}")
             except ftplib.error_perm:
                 pass
+            except ftplib.error_reply as exc:
+                # Some ftpsrv builds answer DELE with 226 instead of 250.
+                if str(exc).startswith("226"):
+                    print(f"deleted {remote}")
+                else:
+                    raise
     finally:
         ftp.quit()
 

@@ -42,6 +42,8 @@ void mh_log(const char *fmt, ...) {
     if (fp) {
       fputs(buf, fp);
       fputc('\n', fp);
+      fflush(fp);
+      fsync(fileno(fp));
       fclose(fp);
       break;
     }

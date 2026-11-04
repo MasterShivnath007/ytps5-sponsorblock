@@ -42,3 +42,4 @@ injector/embedded_blobs.h
 
 # Local video exports (large; upload them, do not commit)
 youtube/*.mp4
+youtube/*.wav

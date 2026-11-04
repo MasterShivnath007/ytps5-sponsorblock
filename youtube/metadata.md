@@ -1,8 +1,10 @@
 # YouTube upload — ytps5
 
-Everything here goes with `youtube/ytps5-70s.mp4` (68 s, 1276×822, natural
-audio, no music). The narration track is not recorded yet; `narration.srt` is
-the script timed to the cut.
+Everything here goes with **`youtube/ytps5-70s-narrated.mp4`** (68 s, 1276×822).
+The narration is already mixed in — locally generated neural TTS (Kokoro,
+voice `am_michael`), with the console's own audio kept low underneath.
+`ytps5-70s.mp4` is the same cut without narration, and `narration.srt` is the
+script if you ever want to record it in your own voice.
 
 ## Title
 
@@ -132,6 +134,7 @@ appears once as plain text, which is descriptive use.
 - [ ] Thumbnail uploaded
 - [ ] "Not made for kids"
 - [ ] Category: Science & Technology
-- [ ] Record narration over `narration.srt`, or upload it as captions
+- [x] Narration is baked in (re-record over `ytps5-70s.mp4` if you prefer your own voice)
+- [ ] Optional: upload `narration.srt` as captions for silent viewers
 - [ ] End screen: link the site
 - [ ] Add to a playlist: "PS5 homebrew"

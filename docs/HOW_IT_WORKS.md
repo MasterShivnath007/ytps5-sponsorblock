@@ -22,7 +22,7 @@ app files.
 
 1. The installer sends the proxy and injector to `elfldr`.
 2. The injector reads `/data/ytps5-sponsorblock/config.txt` and waits for the
-   selected title (default `PPSA01652`). `PPSA01650`/`PPSA01651` are refused
+   selected title (default `PPSA01652`; any `PPSA0165x` build works). `PPSA01650`/`PPSA01651` are refused
    unless `allow_y2jb=1` is set.
 3. It attaches with libhijacker, finds `HTMLScriptExecute`, and makes the target
    page writable from the kernel side.
@@ -74,7 +74,7 @@ version exists.
 
 ## Limits
 
-- Tested only on firmware 8.20 with `PPSA01652`.
+- Tested on firmware 8.20 with YouTube `01.000.003`. Any `PPSA0165x` build of that version can be patched.
 - The `HTMLScriptExecute` signature is matched against the tested app build.
   A store update can change it.
 - The patch is memory-only and is cleared by a console reboot or app exit. The

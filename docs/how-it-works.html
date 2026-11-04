@@ -55,7 +55,7 @@
     <h2>Flow</h2>
     <ol>
       <li>The installer sends the proxy and injector to <code>elfldr</code>.</li>
-      <li>The injector reads <code>/data/ytps5-sponsorblock/config.txt</code> and waits for the selected title (default <code>PPSA01652</code>). <code>PPSA01650</code>/<code>PPSA01651</code> are refused unless <code>allow_y2jb=1</code>.</li>
+      <li>The injector reads <code>/data/ytps5-sponsorblock/config.txt</code> and waits for the title named in <code>patch_title</code> (default <code>PPSA01652</code>; any <code>PPSA0165x</code> build works). <code>PPSA01650</code>/<code>PPSA01651</code> are refused unless <code>allow_y2jb=1</code>.</li>
       <li>It attaches with libhijacker, finds <code>HTMLScriptExecute</code>, and makes the target page writable from the kernel side.</li>
       <li>It installs a <code>scePadRead</code> GOT trigger. On the next controller poll, the trigger applies the <code>HTMLScriptExecute</code> prologue patch from inside the app's own input loop, avoiding a race with a live script call.</li>
       <li>The <code>HTMLScriptExecute</code> hook calls a trampoline containing the original prologue, then calls the original function with a combined string:</li>
@@ -95,7 +95,7 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
 
     <h2>Limits</h2>
     <ul>
-      <li>Tested only on firmware 8.20 with <code>PPSA01652</code>. Patching a Y2JB title is unsupported.</li>
+      <li>Tested on firmware 8.20 with YouTube <code>01.000.003</code>. Any <code>PPSA0165x</code> build of that version can be patched; patching a Y2JB title still needs <code>allow_y2jb=1</code>.</li>
       <li>The <code>HTMLScriptExecute</code> signature is matched against the tested app build. A store update can change it.</li>
       <li>The patch is memory-only and is cleared by a console reboot or app exit. The resident injector re-patches app launches; after a reboot, run the installer again or use autoload.</li>
       <li>No app packages, console keys, DRM tools, or copyrighted files are distributed.</li>

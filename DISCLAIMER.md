@@ -39,8 +39,9 @@ fitness for a particular purpose, and non-infringement. The authors are not
 liable for any claim, damage, console ban, data loss, or other liability arising
 from the use of this software.
 
-**Tested only on PS5 firmware 8.20 with the clean app `PPSA01652`.** Other
-firmware, app versions, and title IDs may not work. Use at your own risk.
+**Tested on PS5 firmware 8.20 with YouTube `01.000.003`.** Any `PPSA0165x`
+build of that version can be patched by naming it in `config.txt`. Other
+firmware and app versions may not work. Use at your own risk.
 
 ## SponsorBlock and third-party services
 

@@ -26,8 +26,10 @@ second homebrew app, no package, no app replacement.
 
 ## Install in two minutes
 
-**You need:** a jailbroken PS5 on **firmware 8.20**, the clean app
-**`PPSA01652`**, and a way to run an ELF (Payload Manager, or any ELF loader).
+**You need:** a jailbroken PS5 on **firmware 8.20**, the YouTube app
+(**`PPSA01652`** by default — any `PPSA0165x` build works, see
+[compatibility](#compatibility)), and a way to run an ELF (Payload Manager, or
+any ELF loader).
 
 1. **Download** [`ytps5.elf`](https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest/download/ytps5.elf)
    — one file, about 9 MB.
@@ -65,22 +67,25 @@ save data, `download0.dat`, or the Y2JB autoloader.
 > **Research and educational project.** Not affiliated with Sony, Google,
 > YouTube, SponsorBlock, or any app vendor. No app packages, keys, DRM bypass
 > tools, or copyrighted content are distributed. You must already own the app.
-> **Tested only on PS5 firmware 8.20 with the clean app `PPSA01652`.** Use at
-> your own risk; no warranty. The Y2JB apps `PPSA01650`/`PPSA01651` are refused
-> by default; patching them requires an explicit opt-in.
+> **Tested on PS5 firmware 8.20 with YouTube `01.000.003`.** Any `PPSA0165x`
+> build can be patched; the title is chosen in `config.txt`. Use at your own
+> risk; no warranty. The Y2JB apps `PPSA01650`/`PPSA01651` are refused by
+> default; patching them requires an explicit opt-in.
 
 ## Compatibility
 
 | App | Role | Status |
 | --- | --- | --- |
-| `PPSA01650` | Y2JB daily driver | 🔴 **Leave for Y2JB.** Refused by default; opt in with `allow_y2jb=1`. |
-| `PPSA01651` | Y2JB daily driver | 🔴 **Leave for Y2JB.** Refused by default; opt in with `allow_y2jb=1`. |
-| `PPSA01652` | Clean player | 🟢 **Recommended.** Tested on FW 8.20; the default target. |
-| other `PPSA0165x` | Native PS5 app | 🟡 Untested. Select with `patch_title=AUTO`. |
+| `PPSA01650` | Y2JB daily driver | 🟡 **Works, but opt in.** Refused by default; needs `patch_title=PPSA01650` and `allow_y2jb=1`. |
+| `PPSA01651` | Y2JB daily driver | 🟡 **Works, but opt in.** Refused by default; needs `patch_title=PPSA01651` and `allow_y2jb=1`. |
+| `PPSA01652` | Clean player | 🟢 **Default target.** Same `01.000.003` build. |
+| other `PPSA0165x` | Native PS5 app | 🟢 **Select with `patch_title=AUTO`.** |
 | `CUSA01116` | PS4-compatibility app | ⚪ Unsupported. |
 
 Which app gets patched is controlled by `/data/ytps5-sponsorblock/config.txt`
-(created on first run). The default is `PPSA01652`. The injector still refuses
+(created on first run). The default is `PPSA01652`, but **you are not limited to
+it**: every build is `01.000.003`, so whichever YouTube app you own can be
+patched by naming it in the config. The injector refuses
 `PPSA01650`/`PPSA01651` unless you explicitly set `allow_y2jb=1`, because those
 are commonly used as Y2JB daily drivers. Nothing writes to app save data,
 `download0.dat`, or the Y2JB autoloader.
@@ -95,10 +100,10 @@ patch_title=PPSA01652   # PPSA01650 | PPSA01651 | PPSA01652 | AUTO
 allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651
 ```
 
-- **Keep Y2JB on `PPSA01650` and patch the clean player:** `patch_title=PPSA01652`
-  (default).
-- **Keep Y2JB on `PPSA01651` and patch `PPSA01650`:** set
-  `patch_title=PPSA01650` and `allow_y2jb=1`.
+- **Patch the app you own:** `patch_title=` that title ID. All three builds are
+  `01.000.003`, and the default is `PPSA01652`.
+- **Keep Y2JB on one build and patch another:** e.g. `patch_title=PPSA01652`
+  while Y2JB keeps `PPSA01650`.
 - **Patch whichever `PPSA0165x` app appears first:** `patch_title=AUTO`. Y2JB
   titles are still refused unless `allow_y2jb=1`.
 
@@ -260,13 +265,15 @@ There is no paywalled feature, telemetry, or mandatory account. See
 ## FAQ
 
 ### How do I block YouTube ads on a PS5?
-On a jailbroken PS5, run `ytps5.elf` once with Payload Manager, then open the
-clean app `PPSA01652`. ytps5 filters in-player, feed and hero ads in memory; it
-does not patch the installed app package. See [Install](#install-in-two-minutes).
+On a jailbroken PS5, run `ytps5.elf` once with Payload Manager, then open your
+YouTube app (default target `PPSA01652`; any `PPSA0165x` build works). ytps5
+filters in-player, feed and hero ads in memory; it does not patch the installed
+app package. See [Install](#install-in-two-minutes).
 
 ### Does ytps5 work on PS5 firmware 8.20?
-FW 8.20 with `PPSA01652` is the only tested combination. Other firmware or app
-builds are untested because the `HTMLScriptExecute` signature can differ.
+FW 8.20 with YouTube `01.000.003` has been tested. Any `PPSA0165x` build of
+that version can be patched; other firmware is untested because the
+`HTMLScriptExecute` signature can differ.
 
 ### Do I need a jailbroken PS5?
 Yes. ytps5 attaches to the running app with libhijacker and patches the process

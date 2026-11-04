@@ -1,12 +1,15 @@
 # ytps5-sponsorblock - which PS5 video app should ytps5 patch?
 #
+# Tested with YouTube 01.000.003 on PS5 firmware 8.20.
+# Every PPSA0165x build is that same version, so any of them can be patched.
+#
 # These are title IDs, not files. Choose ONE app to patch.
 #
-#   PPSA01650  Y2JB daily driver  -> leave it for Y2JB
-#   PPSA01651  Y2JB daily driver  -> leave it for Y2JB
-#   PPSA01652  clean player       -> recommended, used for ytps5
+#   PPSA01650  Y2JB daily driver  -> works, but needs allow_y2jb=1
+#   PPSA01651  Y2JB daily driver  -> works, but needs allow_y2jb=1
+#   PPSA01652  clean player       -> default target
 #
-# Example: Y2JB uses PPSA01650 and you patch the clean player:
+# Example: patch the build you own (default is the clean player):
 #   patch_title=PPSA01652
 #
 # Example: Y2JB uses PPSA01651 and you want to patch PPSA01650:

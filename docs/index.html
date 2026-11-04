@@ -65,7 +65,7 @@
           "name": "How do I block YouTube ads on a PS5?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "On a jailbroken PS5, run ytps5.elf once with Payload Manager, then open the clean app PPSA01652. ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package."
+            "text": "On a jailbroken PS5, run ytps5.elf once with Payload Manager, then open your YouTube app (default PPSA01652; any PPSA0165x build works). ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package."
           }
         },
         {
@@ -73,7 +73,7 @@
           "name": "Does ytps5 work on PS5 firmware 8.20?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Firmware 8.20 with PPSA01652 is the only tested combination. Other firmware or app builds are untested because the HTMLScriptExecute signature can differ."
+            "text": "Firmware 8.20 with YouTube 01.000.003 has been tested. Any PPSA0165x build of that version can be patched by naming it in config.txt. Other firmware is untested because the HTMLScriptExecute signature can differ."
           }
         },
         {
@@ -97,7 +97,7 @@
           "name": "Will ytps5 work on PPSA01650 or PPSA01651?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Not by default. Those are commonly used as Y2JB daily drivers and are refused unless you set patch_title to one of them and allow_y2jb=1 in /data/ytps5-sponsorblock/config.txt. The recommended setup is to leave the Y2JB app alone and patch a clean app such as PPSA01652."
+            "text": "Yes, with an opt-in. Those are commonly used as Y2JB daily drivers, so they are refused unless you set patch_title to one of them and allow_y2jb=1 in /data/ytps5-sponsorblock/config.txt. The recommended setup is to leave the Y2JB app alone and patch a different PPSA0165x build."
           }
         },
         {
@@ -143,7 +143,7 @@
 
 <section class="hero">
   <div class="wrap">
-    <div class="eyebrow"><span class="dot" aria-hidden="true"></span><b>Unofficial</b> · FW 8.20 · PPSA01652</div>
+    <div class="eyebrow"><span class="dot" aria-hidden="true"></span><b>Unofficial</b> · FW 8.20 · YouTube 01.000.003</div>
     <h1>Block YouTube ads and skip sponsor segments on the PS5.</h1>
     <p class="lede">
       ytps5 is a free, open-source runtime mod for the official PS5 video app on
@@ -168,7 +168,8 @@
       <strong>Research and educational project.</strong> Not affiliated with Sony,
       Google, YouTube, or SponsorBlock. No app packages, console keys, DRM bypass
       tools, or copyrighted content are distributed; you must already own the app.
-      Tested only on PS5 firmware 8.20 with the clean app <code>PPSA01652</code>.
+      Tested on PS5 firmware 8.20 with YouTube <code>01.000.003</code>. Any
+      <code>PPSA0165x</code> build can be patched; pick it in <code>config.txt</code>.
       The Y2JB apps <code>PPSA01650</code>/<code>PPSA01651</code> are refused by
       default; patching them needs an explicit opt-in. Use at your own risk; no
       warranty.
@@ -241,10 +242,10 @@
           <tr><th scope="col">App</th><th scope="col">Role</th><th scope="col">Status</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>PPSA01650</code></td><td>Y2JB daily driver</td><td class="no">Leave for Y2JB — refused by default</td></tr>
-          <tr><td><code>PPSA01651</code></td><td>Y2JB daily driver</td><td class="no">Leave for Y2JB — refused by default</td></tr>
-          <tr><td><code>PPSA01652</code></td><td>Clean player</td><td class="yes">Recommended — tested on FW 8.20</td></tr>
-          <tr><td>other <code>PPSA0165x</code></td><td>Native PS5 app</td><td class="partial">Untested — select with <code>patch_title=AUTO</code></td></tr>
+          <tr><td><code>PPSA01650</code></td><td>Y2JB daily driver</td><td class="partial">Works with <code>allow_y2jb=1</code></td></tr>
+          <tr><td><code>PPSA01651</code></td><td>Y2JB daily driver</td><td class="partial">Works with <code>allow_y2jb=1</code></td></tr>
+          <tr><td><code>PPSA01652</code></td><td>Clean player</td><td class="yes">Default target — same 01.000.003 build</td></tr>
+          <tr><td>other <code>PPSA0165x</code></td><td>Native PS5 app</td><td class="yes">Select with <code>patch_title=AUTO</code></td></tr>
           <tr><td><code>CUSA01116</code></td><td>PS4-compatibility app</td><td class="no">Unsupported</td></tr>
         </tbody>
       </table>
@@ -275,14 +276,14 @@
     <div class="section-head">
       <div class="kicker">App selection</div>
       <h2>Choose which app to patch.</h2>
-      <p>On first run, ytps5 writes a commented config file. Keep the Y2JB app for Y2JB and patch the clean player.</p>
+      <p>On first run, ytps5 writes a commented config file. Name the YouTube app you want patched — every <code>PPSA0165x</code> build is the same <code>01.000.003</code> version.</p>
     </div>
     <pre><code># /data/ytps5-sponsorblock/config.txt
 patch_title=PPSA01652   # PPSA01650 | PPSA01651 | PPSA01652 | AUTO
 allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
     <ul style="color:var(--muted);line-height:1.8">
-      <li><strong style="color:var(--text)">Y2JB on <code>PPSA01650</code>, patch the clean player:</strong> <code>patch_title=PPSA01652</code> (default).</li>
-      <li><strong style="color:var(--text)">Y2JB on <code>PPSA01651</code>, patch <code>PPSA01650</code>:</strong> <code>patch_title=PPSA01650</code> and <code>allow_y2jb=1</code>.</li>
+      <li><strong style="color:var(--text)">Patch the app you own:</strong> <code>patch_title=</code> that title ID. Default is <code>PPSA01652</code>.</li>
+      <li><strong style="color:var(--text)">Y2JB on <code>PPSA01650</code>, patch <code>PPSA01652</code>:</strong> <code>patch_title=PPSA01652</code> (the default).</li>
       <li><strong style="color:var(--text)">Patch whichever <code>PPSA0165x</code> appears:</strong> <code>patch_title=AUTO</code>. Y2JB titles are still refused unless <code>allow_y2jb=1</code>.</li>
     </ul>
     <p style="color:var(--faint);font-size:14px;margin-top:14px">Edit the file over FTP (port <code>2121</code>) or the console file manager, then restart <code>ytps5.elf</code>. Patching a Y2JB app can break the jailbreak/autoload chain; only opt in if you have a second clean app for Y2JB.</p>
@@ -298,7 +299,7 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
     <div class="grid">
       <article class="card">
         <h3>1. Attach and suspend</h3>
-        <p>The injector finds the clean app process and suspends it before touching executable memory.</p>
+        <p>The injector finds the YouTube app process and suspends it before touching executable memory.</p>
       </article>
       <article class="card">
         <h3>2. Patch the prologue</h3>
@@ -323,11 +324,11 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
     <div class="faq">
       <details>
         <summary>How do I block YouTube ads on a PS5?</summary>
-        <div class="answer"><p>On a jailbroken PS5, run <code>ytps5.elf</code> once with Payload Manager, then open the clean app <code>PPSA01652</code>. ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package.</p></div>
+        <div class="answer"><p>On a jailbroken PS5, run <code>ytps5.elf</code> once with Payload Manager, then open your YouTube app (default <code>PPSA01652</code>). ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package.</p></div>
       </details>
       <details>
         <summary>Does ytps5 work on PS5 firmware 8.20?</summary>
-        <div class="answer"><p>Firmware 8.20 with <code>PPSA01652</code> is the only tested combination. Other firmware or app builds are untested because the <code>HTMLScriptExecute</code> signature can differ.</p></div>
+        <div class="answer"><p>Firmware 8.20 with YouTube <code>01.000.003</code> has been tested. Any <code>PPSA0165x</code> build of that version can be patched; other firmware is untested because the <code>HTMLScriptExecute</code> signature can differ.</p></div>
       </details>
       <details>
         <summary>Do I need a jailbroken PS5?</summary>
@@ -339,7 +340,7 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
       </details>
       <details>
         <summary>Will it work on PPSA01650 or PPSA01651?</summary>
-        <div class="answer"><p>Not by default. Those are commonly used as Y2JB daily drivers and are refused unless you set <code>patch_title</code> to one of them and <code>allow_y2jb=1</code> in <code>/data/ytps5-sponsorblock/config.txt</code>. The recommended setup is to leave the Y2JB app alone and patch a clean app such as <code>PPSA01652</code>.</p></div>
+        <div class="answer"><p>Yes, with an opt-in. Those are commonly used as Y2JB daily drivers, so they are refused unless you set <code>patch_title</code> to one of them and <code>allow_y2jb=1</code> in <code>/data/ytps5-sponsorblock/config.txt</code>. The recommended setup is to leave the Y2JB app alone and patch a different <code>PPSA0165x</code> build.</p></div>
       </details>
       <details>
         <summary>Does it support SponsorBlock?</summary>
@@ -370,7 +371,7 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
         <li>This project contains <strong>no</strong> app packages, console keys, DRM bypass tooling, or copyrighted app files.</li>
         <li>It does not modify the installed app package. The patch exists only in the running process's memory and disappears when the app or console restarts.</li>
         <li>It is intended for research, education, and personal use on hardware you own and control. Check the laws and terms that apply to you.</li>
-        <li>The tool refuses <code>PPSA01650</code> and <code>PPSA01651</code> by default because those are commonly used as Y2JB daily drivers. Patching them requires an explicit <code>allow_y2jb=1</code> opt-in and is unsupported.</li>
+        <li>The tool refuses <code>PPSA01650</code> and <code>PPSA01651</code> by default because those are commonly used as Y2JB daily drivers. Patching them requires an explicit <code>allow_y2jb=1</code> opt-in.</li>
         <li>SponsorBlock is an independent community service. This project only calls its public API.</li>
         <li>This site counts visits with a cookie-free counter: aggregate page views and download clicks only, with the referring hostname. No cookies, no identifiers, no personal data.</li>
         <li>Not affiliated with Sony, Google, YouTube, SponsorBlock, or any app vendor. No warranty; use at your own risk.</li>

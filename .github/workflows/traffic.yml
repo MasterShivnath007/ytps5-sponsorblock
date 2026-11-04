@@ -1,0 +1,40 @@
+name: metrics
+
+# GitHub only exposes the last 14 days of traffic, so this copies it out
+# daily into metrics/traffic.csv. Aggregate counts only, no visitor data.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: metrics
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Snapshot traffic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 scripts/snapshot_traffic.py
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add metrics/traffic.csv
+          if git diff --cached --quiet; then
+            echo "No metrics changed."
+            exit 0
+          fi
+          git commit -m "[skip ci] metrics: traffic snapshot"
+          git push

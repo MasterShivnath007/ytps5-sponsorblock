@@ -30,6 +30,11 @@ dist/
 *.png
 # Website assets are the exception
 !docs/*.png
+!docs/media/*.png
+
+# Local tutorial recordings (large; the raw take contains unredacted personal data)
+Tutorial.mov
+Tutorial-*.mp4
 
 # Generated direct-hook / embedded headers
 injector/direct_hook_blob.h

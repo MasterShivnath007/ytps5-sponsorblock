@@ -451,3 +451,20 @@ footer {
   section { padding: 46px 0; }
   .brand span { display: none; }
 }
+
+/* demo */
+.demo-figure { margin: 0 auto; max-width: 980px; }
+.demo-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+.demo-figure figcaption {
+  margin-top: 14px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}

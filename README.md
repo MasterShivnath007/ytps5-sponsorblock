@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/social.png" alt="ytps5 — block YouTube ads and skip sponsor segments in the official PS5 video app" width="100%">
+</p>
+
 # ytps5
 
 [![Release](https://img.shields.io/github/v/release/MasterShivnath007/ytps5-sponsorblock?color=orange)](https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest)
@@ -5,15 +9,58 @@
 [![Firmware: 8.20](https://img.shields.io/badge/firmware-8.20-black.svg)](#compatibility)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github)](https://github.com/sponsors/MasterShivnath007)
 
-**Block YouTube ads and skip sponsor segments in the official PS5 video app on a jailbroken PS5.**
+**Block YouTube ads and skip sponsor segments in the official PS5 video app — no package install, no app replacement.**
 
-ytps5 is a runtime quality-of-life mod. It adds ad filtering, SponsorBlock
-skipping, and a native settings panel with support/QR and update notifications.
-It does **not** contain, modify, or redistribute the app, app packages, console
-keys, DRM tools, or any copyrighted app files. It attaches to the app you
-already own and patches the running process in memory.
+ytps5 is a runtime quality-of-life mod. It attaches to the app you already own
+and patches the running process in memory: in-player, feed and hero ads are
+filtered out, SponsorBlock segments are skipped, and settings live in a native
+panel inside the app. It does **not** contain, modify, or redistribute the app,
+app packages, console keys, DRM tools, or any copyrighted app files.
+
+![The ytps5 Settings panel inside the YouTube app](docs/media/demo.gif)
+
+Settings live inside the app itself — section *Settings → ytps5 Settings*. No
+second homebrew app, no package, no app replacement.
 
 **Website:** https://mastershivnath007.github.io/ytps5-sponsorblock/
+
+## Install in two minutes
+
+**You need:** a jailbroken PS5 on **firmware 8.20**, the clean app
+**`PPSA01652`**, and a way to run an ELF (Payload Manager, or any ELF loader).
+
+1. **Download** [`ytps5.elf`](https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest/download/ytps5.elf)
+   — one file, about 9 MB.
+2. **Add it to Payload Manager** → *local payloads* → add/upload `ytps5.elf`.
+3. **Run `ytps5`** and wait for the toast **`ytps5: waiting for PPSA01652`**.
+4. **Open the YouTube app** (`PPSA01652`). It freezes for a moment while the
+   hook installs, then shows **`ytps5: hook installed`**.
+5. **Change settings in the app:** *Settings → ytps5 Settings*.
+
+<a id="install-details"></a>
+
+<details>
+<summary><b>Install details, autoload, and what the ELF actually does</b></summary>
+
+The single ELF embeds the onboarding proxy and the injector. It only uses
+network loopback to hand the real payloads to the console's own `elfldr`, so it
+also works when launched directly by Payload Manager. Nothing is written to app
+save data, `download0.dat`, or the Y2JB autoloader.
+
+**Automatic start (optional).** To start everything after each boot/jailbreak:
+
+- **Payload Manager:** add `ytps5.elf` to `autoload.txt`.
+- **etaHEN:** place it in the payload autoload list.
+
+**Every boot or every app launch?**
+
+- **Every boot/jailbreak:** run the installer once — the patch is memory-only and
+  a reboot clears it. Autoload makes this automatic.
+- **Every app launch:** no. The resident injector waits for the app, patches it,
+  waits for it to close, and patches the next launch automatically.
+- **After a full console restart:** run `ytps5.elf` again, or rely on autoload.
+
+</details>
 
 > **Research and educational project.** Not affiliated with Sony, Google,
 > YouTube, SponsorBlock, or any app vendor. No app packages, keys, DRM bypass
@@ -75,39 +122,6 @@ restart `ytps5.elf` so the injector re-reads it.
   exists.
 - The payload stays resident and **re-patches every app launch** until the
   console is rebooted.
-
-## Install (single file)
-
-1. Download the latest `ytps5.elf` from the **Releases** page.
-2. Copy it to the console or a USB drive.
-3. On the console, open **Payload Manager** → local payloads → upload/add
-   `ytps5.elf` → run it.
-4. Wait for the **“ytps5: waiting for PPSA01652”** toast (or your configured
-   title).
-5. Open the configured app (`PPSA01652` by default). It will freeze for a
-   moment while the hook is installed, then show **“ytps5: hook installed”**.
-
-The single ELF embeds the onboarding proxy and the injector. It only uses
-network loopback to hand the real payloads to the console's own `elfldr`, so it
-also works when launched directly by Payload Manager.
-
-### Automatic start (optional)
-
-To start everything after each boot/jailbreak, add `ytps5.elf` to your
-autoloader:
-
-- Payload Manager: add `ytps5.elf` to `autoload.txt`.
-- etaHEN: place it in the payload autoload list.
-
-The installer does **not** modify the Y2JB app or its files.
-
-## One-time run or every boot?
-
-- **Every boot/jailbreak:** the installer must run once, because the patch is
-  memory-only and a reboot clears it. With autoload enabled this is automatic.
-- **Every app launch:** no. The resident injector waits for the app, patches it,
-  waits for it to close, and patches the next launch automatically.
-- **After a full console restart:** run `ytps5.elf` again, or rely on autoload.
 
 ## Settings and support
 
@@ -248,7 +262,7 @@ There is no paywalled feature, telemetry, or mandatory account. See
 ### How do I block YouTube ads on a PS5?
 On a jailbroken PS5, run `ytps5.elf` once with Payload Manager, then open the
 clean app `PPSA01652`. ytps5 filters in-player, feed and hero ads in memory; it
-does not patch the installed app package. See [Install](#install-single-file).
+does not patch the installed app package. See [Install](#install-in-two-minutes).
 
 ### Does ytps5 work on PS5 firmware 8.20?
 FW 8.20 with `PPSA01652` is the only tested combination. Other firmware or app

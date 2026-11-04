@@ -2,6 +2,11 @@ name: metrics
 
 # GitHub only exposes the last 14 days of traffic, so this copies it out
 # daily into metrics/traffic.csv. Aggregate counts only, no visitor data.
+#
+# Traffic endpoints need push access, which the default GITHUB_TOKEN lacks.
+# Add a repository secret named TRAFFIC_TOKEN to collect views and clones:
+#   gh auth token | gh secret set TRAFFIC_TOKEN
+# Without it the job still records stars and download counts, and warns.
 
 on:
   schedule:
@@ -23,7 +28,7 @@ jobs:
 
       - name: Snapshot traffic
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TRAFFIC_TOKEN || secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: python3 scripts/snapshot_traffic.py
 

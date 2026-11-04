@@ -55,6 +55,7 @@ def token() -> str | None:
 
 
 TOKEN = token()
+FAILED: list[tuple[str, int]] = []
 
 
 def get(path: str):
@@ -73,7 +74,16 @@ def get(path: str):
         with urllib.request.urlopen(req, timeout=30) as r:
             return json.load(r)
     except urllib.error.HTTPError as e:
-        print(f"warn: {path} -> HTTP {e.code}", file=sys.stderr)
+        FAILED.append((path, e.code))
+        if e.code == 403:
+            # Expected inside Actions with the default token.
+            print(f"warn: {path} -> HTTP 403 (no access)", file=sys.stderr)
+        else:
+            print(f"warn: {path} -> HTTP {e.code}", file=sys.stderr)
+        return None
+    except Exception as e:  # network hiccup: keep the previous history
+        FAILED.append((path, 0))
+        print(f"warn: {path} -> {e}", file=sys.stderr)
         return None
 
 
@@ -84,6 +94,19 @@ def main() -> int:
     paths = get("/traffic/popular/paths") or []
     repo = get("") or {}
     releases = get("/releases?per_page=100") or []
+
+    # Traffic endpoints need push access, which the default GITHUB_TOKEN does
+    # not have. Say so loudly instead of writing a file that looks fine.
+    traffic_blocked = any(
+        path.startswith("/traffic/") and code == 403 for path, code in FAILED
+    )
+    if traffic_blocked:
+        print(
+            "::warning::Traffic endpoints returned 403. Add a repo secret "
+            "TRAFFIC_TOKEN (classic PAT with 'repo' scope, or the account's "
+            "gh auth token) to collect views and clones from Actions.",
+            file=sys.stderr,
+        )
 
     per_day: dict[str, dict[str, str]] = {}
 
@@ -120,6 +143,11 @@ def main() -> int:
     path_summary = ";".join(f'{p["path"].rstrip("/") or "/"}:{p["count"]}' for p in paths[:10])
 
     for d, row in per_day.items():
+        if traffic_blocked and d == today:
+            # Do not overwrite numbers recorded by a run that had access.
+            for key in ("views", "view_uniques", "clones", "clone_uniques"):
+                row.pop(key, None)
+            continue
         row.setdefault("views", "0")
         row.setdefault("view_uniques", "0")
         row.setdefault("clones", "0")

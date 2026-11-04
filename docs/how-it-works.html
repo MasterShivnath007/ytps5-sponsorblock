@@ -95,7 +95,7 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
 
     <h2>Limits</h2>
     <ul>
-      <li>Tested on firmware 8.20 with YouTube <code>01.000.003</code>. Any <code>PPSA0165x</code> build of that version can be patched; patching a Y2JB title still needs <code>allow_y2jb=1</code>.</li>
+      <li>Tested on firmware 8.20 with YouTube <code>01.000.003</code> (<code>PPSA01652</code>). Any <code>PPSA0165x</code> build of that version can be patched; patching a Y2JB title still needs <code>allow_y2jb=1</code>.</li>
       <li>The <code>HTMLScriptExecute</code> signature is matched against the tested app build. A store update can change it.</li>
       <li>The patch is memory-only and is cleared by a console reboot or app exit. The resident injector re-patches app launches; after a reboot, run the installer again or use autoload.</li>
       <li>No app packages, console keys, DRM tools, or copyrighted files are distributed.</li>

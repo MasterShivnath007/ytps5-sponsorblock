@@ -67,7 +67,7 @@ save data, `download0.dat`, or the Y2JB autoloader.
 > **Research and educational project.** Not affiliated with Sony, Google,
 > YouTube, SponsorBlock, or any app vendor. No app packages, keys, DRM bypass
 > tools, or copyrighted content are distributed. You must already own the app.
-> **Tested on PS5 firmware 8.20 with YouTube `01.000.003`.** Any `PPSA0165x`
+> **Tested on PS5 firmware 8.20 with YouTube `01.000.003` (`PPSA01652`).** Any `PPSA0165x`
 > build can be patched; the title is chosen in `config.txt`. Use at your own
 > risk; no warranty. The Y2JB apps `PPSA01650`/`PPSA01651` are refused by
 > default; patching them requires an explicit opt-in.
@@ -271,7 +271,7 @@ filters in-player, feed and hero ads in memory; it does not patch the installed
 app package. See [Install](#install-in-two-minutes).
 
 ### Does ytps5 work on PS5 firmware 8.20?
-FW 8.20 with YouTube `01.000.003` has been tested. Any `PPSA0165x` build of
+FW 8.20 with YouTube `01.000.003` (`PPSA01652`) has been tested. Any `PPSA0165x` build of
 that version can be patched; other firmware is untested because the
 `HTMLScriptExecute` signature can differ.
 

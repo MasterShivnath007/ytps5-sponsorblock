@@ -10,8 +10,9 @@ app files.
   hands both to the console's own `elfldr` on `127.0.0.1:9021`.
 - Proxy (`injector/dump_server.c`) — a small local HTTP service on port `4040`.
   It fetches SponsorBlock data (and `version.json`) over HTTPS.
-- Injector (`injector/main.cpp`) — attaches to the clean app process, finds
-  `HTMLScriptExecute`, installs a trampoline and hook, and stays resident.
+- Injector (`injector/main.cpp`) — reads `config.txt`, attaches to the selected
+  app process, finds `HTMLScriptExecute`, installs a trampoline and hook, and
+  stays resident.
 - Hook (`injector/direct_hook.c`) — a tiny position-independent blob that
   prepends the JavaScript payload to each script.
 - Payload (`payload/inject.src.js`, minified to `payload/inject.js`) — ad
@@ -20,8 +21,9 @@ app files.
 ## Flow
 
 1. The installer sends the proxy and injector to `elfldr`.
-2. The injector waits for a `PPSA0165x` app. It refuses `PPSA01650`/`PPSA01651`
-   (Y2JB daily drivers) and waits for a clean title.
+2. The injector reads `/data/ytps5-sponsorblock/config.txt` and waits for the
+   selected title (default `PPSA01652`). `PPSA01650`/`PPSA01651` are refused
+   unless `allow_y2jb=1` is set.
 3. It attaches with libhijacker, finds `HTMLScriptExecute`, and makes the target
    page writable from the kernel side.
 4. It installs a `scePadRead` GOT trigger. On the next controller poll, the
@@ -40,6 +42,20 @@ app files.
    segments through the local proxy, and skips matching segments.
 7. The injector stays resident. When the app closes, it waits for the next
    launch and patches the new process.
+
+## App selection
+
+On first run the injector writes `/data/ytps5-sponsorblock/config.txt`:
+
+```ini
+patch_title=PPSA01652   # PPSA01650 | PPSA01651 | PPSA01652 | AUTO
+allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651
+```
+
+`patch_title` is matched exactly against the running app's title ID. `AUTO`
+matches any `PPSA0165x`. The Y2JB daily drivers are refused unless
+`allow_y2jb=1`; the default is the clean player. The file is read once at
+injector startup, so restart `ytps5.elf` after editing it.
 
 ## Settings
 

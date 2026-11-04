@@ -9,7 +9,8 @@ labels: bug
 - PS5 firmware:
 - Jailbreak (Y2JB / Relapse / other):
 - etaHEN version:
-- App title ID and version (`PPSA01652` recommended; `PPSA01650`/`PPSA01651` are Y2JB apps and are not supported for patching):
+- App title ID and version (`PPSA01652` recommended; `PPSA01650`/`PPSA01651` are Y2JB apps and need `allow_y2jb=1`):
+- `patch_title` / `allow_y2jb` from `/data/ytps5-sponsorblock/config.txt`:
 - Release version (`v1.0.0`, etc.):
 
 **What happened**
@@ -31,9 +32,11 @@ python3 tools/ytps5.py logs --host <PS5_IP> --save
 
 **Checklist**
 
-- [ ] I used the clean app `PPSA01652`, not `PPSA01650`/`PPSA01651`.
+- [ ] I used the app selected in `config.txt` (default `PPSA01652`); if it was
+      `PPSA01650`/`PPSA01651`, I set `allow_y2jb=1`.
 - [ ] I ran `ytps5.elf` after the last reboot/jailbreak.
-- [ ] The installer showed “ytps5: waiting for the supported app”.
+- [ ] The installer showed “ytps5: waiting for PPSA01652” (or my configured
+      title).
 - [ ] I opened the app after the installer was waiting.
 
 **Was the app running before you ran the installer?**

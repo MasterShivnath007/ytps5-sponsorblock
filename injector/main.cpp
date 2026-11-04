@@ -5,6 +5,7 @@
  * hooks scePadReadState with a tiny raw hook, and lets that hook dlopen()
  * sponsorblock.so inside the app process.
  */
+#include <cctype>
 #include <cstddef>
 #include <stdarg.h>
 #include <stdint.h>
@@ -43,8 +44,14 @@ static constexpr Nid kPadReadNid{"q1cHNfGycLI"};
 
 #define LOG_DIR "/data/ytps5-sponsorblock"
 #define LOG_FILE LOG_DIR "/injector.log"
+#define CONFIG_FILE LOG_DIR "/config.txt"
 
 static FILE *g_log = nullptr;
+
+/* User-facing app selection. Safe default: the clean player only. */
+static std::string g_patch_title = "PPSA01652";
+static bool g_allow_y2jb = false;
+static bool is_y2jb_title(const char *tid);
 
 extern "C" int sceKernelDebugOutText(int channel, const char *text);
 
@@ -123,6 +130,117 @@ static void load_options() {
   fclose(fp);
 }
 
+static std::string trim_copy(const std::string &s) {
+  size_t first = s.find_first_not_of(" \t\r\n");
+  if (first == std::string::npos) return "";
+  size_t last = s.find_last_not_of(" \t\r\n");
+  return s.substr(first, last - first + 1);
+}
+
+static std::string upper_copy(std::string s) {
+  for (char &c : s) c = (char)toupper((unsigned char)c);
+  return s;
+}
+
+/*
+ * Write the commented template on first run. The file lives next to the logs
+ * so the user can edit it from FTP without rebuilding anything.
+ */
+static bool write_default_config() {
+  mkdir(LOG_DIR, 0777);
+  FILE *fp = fopen(CONFIG_FILE, "w");
+  if (!fp) return false;
+  fputs(
+      "# ytps5-sponsorblock - which PS5 video app should ytps5 patch?\n"
+      "#\n"
+      "# These are title IDs, not files. Choose ONE app to patch.\n"
+      "#\n"
+      "#   PPSA01650  Y2JB daily driver  -> leave it for Y2JB\n"
+      "#   PPSA01651  Y2JB daily driver  -> leave it for Y2JB\n"
+      "#   PPSA01652  clean player       -> recommended, used for ytps5\n"
+      "#\n"
+      "# Example: Y2JB uses PPSA01650 and you patch the clean player:\n"
+      "#   patch_title=PPSA01652\n"
+      "#\n"
+      "# Example: Y2JB uses PPSA01651 and you want to patch PPSA01650:\n"
+      "#   patch_title=PPSA01650\n"
+      "#   allow_y2jb=1\n"
+      "#\n"
+      "# ytps5 refuses PPSA01650/PPSA01651 by default so it cannot break Y2JB.\n"
+      "# Set allow_y2jb=1 only if you are sure the chosen app is not the one\n"
+      "# your jailbreak/autoload depends on.\n"
+      "#\n"
+      "# AUTO patches whichever PPSA0165x app appears first, but still refuses\n"
+      "# the Y2JB titles unless allow_y2jb=1.\n"
+      "\n"
+      "patch_title=PPSA01652\n"
+      "\n"
+      "# 0 = refuse the Y2JB daily drivers (safe, default)\n"
+      "# 1 = allow patching PPSA01650/PPSA01651\n"
+      "allow_y2jb=0\n",
+      fp);
+  fclose(fp);
+  return true;
+}
+
+static bool parse_bool(const std::string &v) {
+  std::string s = upper_copy(trim_copy(v));
+  return s == "1" || s == "TRUE" || s == "YES" || s == "ON";
+}
+
+static void load_config() {
+  mkdir(LOG_DIR, 0777);
+  FILE *fp = fopen(CONFIG_FILE, "r");
+  if (!fp) {
+    if (write_default_config()) {
+      logf("config: created %s with defaults", CONFIG_FILE);
+    } else {
+      logf("config: cannot create %s, using defaults", CONFIG_FILE);
+    }
+    return;
+  }
+
+  char line[256];
+  while (fgets(line, sizeof(line), fp)) {
+    std::string s = trim_copy(line);
+    if (s.empty() || s[0] == '#' || s[0] == ';') continue;
+    size_t eq = s.find('=');
+    if (eq == std::string::npos) continue;
+    std::string key = upper_copy(trim_copy(s.substr(0, eq)));
+    std::string val = trim_copy(s.substr(eq + 1));
+    if (val.size() >= 2 &&
+        ((val.front() == '"' && val.back() == '"') ||
+         (val.front() == '\'' && val.back() == '\''))) {
+      val = trim_copy(val.substr(1, val.size() - 2));
+    }
+
+    if (key == "PATCH_TITLE") {
+      std::string want = upper_copy(val);
+      if (want == "PPSA01650" || want == "PPSA01651" ||
+          want == "PPSA01652" || want == "AUTO") {
+        g_patch_title = want;
+      } else {
+        logf("config: invalid patch_title '%s', keeping %s", val.c_str(),
+             g_patch_title.c_str());
+      }
+    } else if (key == "ALLOW_Y2JB") {
+      g_allow_y2jb = parse_bool(val);
+    }
+  }
+  fclose(fp);
+
+  /* Never silently patch a Y2JB title. If one was selected without the
+   * explicit opt-in, fall back to the clean player and say so. */
+  if (is_y2jb_title(g_patch_title.c_str()) && !g_allow_y2jb) {
+    logf("config: %s is a Y2JB title but allow_y2jb=0; using PPSA01652",
+         g_patch_title.c_str());
+    g_patch_title = "PPSA01652";
+  }
+
+  logf("config: patch_title=%s allow_y2jb=%d", g_patch_title.c_str(),
+       g_allow_y2jb ? 1 : 0);
+}
+
 extern "C" {
 int sceSystemServiceGetAppIdOfRunningBigApp(void);
 int sceSystemServiceGetAppTitleId(int app_id, char *title_id);
@@ -135,7 +253,11 @@ int sceKernelDebugOutText(int channel, const char *text);
 }
 
 static bool supported_title(const char *tid) {
-  return tid && strncmp(tid, "PPSA0165", 8) == 0;
+  if (!tid) return false;
+  if (g_patch_title == "AUTO") {
+    return strncmp(tid, "PPSA0165", 8) == 0;
+  }
+  return g_patch_title == tid;
 }
 
 static bool find_supported_app(int &pid, int &appid, char *title, size_t title_size) {
@@ -561,6 +683,7 @@ static bool is_y2jb_title(const char *tid) {
 int main() {
   log_open();
   load_options();
+  load_config();
 
   payload_args_t *args = payload_get_args();
   kernel_base = args->kdata_base_addr;
@@ -686,7 +809,9 @@ int main() {
     int pid = -1;
     int appid = -1;
     char title[256] = {0};
-    notifyf("ytps5: waiting for the supported app");
+    notifyf("ytps5: waiting for %s",
+            g_patch_title == "AUTO" ? "a PPSA0165x app"
+                                    : g_patch_title.c_str());
 
     for (int attempt = 0; ; ++attempt) {
       if (find_supported_app(pid, appid, title, sizeof(title))) break;
@@ -699,8 +824,8 @@ int main() {
     }
 
     logf("found title=%s appid=%d pid=%d", title, appid, pid);
-    if (is_y2jb_title(title)) {
-      logf("refusing Y2JB title %s", title);
+    if (is_y2jb_title(title) && !g_allow_y2jb) {
+      logf("refusing Y2JB title %s (allow_y2jb=0)", title);
       notifyf("ytps5: %s is a Y2JB app - NOT patching", title);
       while (find_supported_app(pid, appid, title, sizeof(title)) &&
              is_y2jb_title(title)) {
@@ -713,7 +838,11 @@ int main() {
       continue;
     }
     last_pid = pid;
-    notifyf("ytps5: %s is clean - patching", title);
+    if (is_y2jb_title(title)) {
+      notifyf("ytps5: patching Y2JB app %s (override)", title);
+    } else {
+      notifyf("ytps5: patching %s", title);
+    }
 
     if (g_attach_delay > 0) {
       logf("waiting %ds for the app to finish loading", g_attach_delay);

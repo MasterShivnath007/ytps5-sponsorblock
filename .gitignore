@@ -3,6 +3,9 @@
 *.pkg
 *.PKG
 
+# Locally downloaded PS5 payload SDK (~700 MB, fetched by scripts/setup_sdk.sh)
+third_party/ps5-sdk/
+
 # Build output
 build/
 *.o

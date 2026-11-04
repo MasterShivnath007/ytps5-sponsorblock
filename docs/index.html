@@ -97,7 +97,7 @@
           "name": "Will ytps5 work on PPSA01650 or PPSA01651?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. Those are commonly used as Y2JB daily drivers, and the tool deliberately refuses to patch them. Use a clean app such as PPSA01652."
+            "text": "Not by default. Those are commonly used as Y2JB daily drivers and are refused unless you set patch_title to one of them and allow_y2jb=1 in /data/ytps5-sponsorblock/config.txt. The recommended setup is to leave the Y2JB app alone and patch a clean app such as PPSA01652."
           }
         },
         {
@@ -127,6 +127,7 @@
       <a href="#features">Features</a>
       <a href="#compatibility">Compatibility</a>
       <a href="#install">Install</a>
+      <a href="#config">Config</a>
       <a href="how-it-works.html">How it works</a>
       <a href="#faq">FAQ</a>
       <a class="nav-cta" href="https://github.com/MasterShivnath007/ytps5-sponsorblock" target="_blank" rel="noopener">
@@ -167,8 +168,9 @@
       Google, YouTube, or SponsorBlock. No app packages, console keys, DRM bypass
       tools, or copyrighted content are distributed; you must already own the app.
       Tested only on PS5 firmware 8.20 with the clean app <code>PPSA01652</code>.
-      Do not use this with the Y2JB apps <code>PPSA01650</code>/<code>PPSA01651</code>.
-      Use at your own risk; no warranty.
+      The Y2JB apps <code>PPSA01650</code>/<code>PPSA01651</code> are refused by
+      default; patching them needs an explicit opt-in. Use at your own risk; no
+      warranty.
     </div>
   </div>
 </section>
@@ -228,10 +230,10 @@
           <tr><th scope="col">App</th><th scope="col">Role</th><th scope="col">Status</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>PPSA01650</code></td><td>Y2JB daily driver</td><td class="no">Never patch — the tool refuses</td></tr>
-          <tr><td><code>PPSA01651</code></td><td>Y2JB daily driver</td><td class="no">Never patch — the tool refuses</td></tr>
+          <tr><td><code>PPSA01650</code></td><td>Y2JB daily driver</td><td class="no">Leave for Y2JB — refused by default</td></tr>
+          <tr><td><code>PPSA01651</code></td><td>Y2JB daily driver</td><td class="no">Leave for Y2JB — refused by default</td></tr>
           <tr><td><code>PPSA01652</code></td><td>Clean player</td><td class="yes">Recommended — tested on FW 8.20</td></tr>
-          <tr><td>other <code>PPSA0165x</code></td><td>Native PS5 app</td><td class="partial">Untested — signatures can differ</td></tr>
+          <tr><td>other <code>PPSA0165x</code></td><td>Native PS5 app</td><td class="partial">Untested — select with <code>patch_title=AUTO</code></td></tr>
           <tr><td><code>CUSA01116</code></td><td>PS4-compatibility app</td><td class="no">Unsupported</td></tr>
         </tbody>
       </table>
@@ -250,15 +252,33 @@
       <li><div><b>Download <code>ytps5.elf</code></b><p>Use the latest release on GitHub. Do not use a mirror or a reupload.</p></div></li>
       <li><div><b>Copy it to the console or a USB drive</b><p>Any folder Payload Manager can read is fine.</p></div></li>
       <li><div><b>Open Payload Manager → local payloads</b><p>Add or upload <code>ytps5.elf</code>, then run it.</p></div></li>
-      <li><div><b>Wait for the toast</b><p>You should see “ytps5: waiting for the supported app”.</p></div></li>
-      <li><div><b>Open the clean app <code>PPSA01652</code></b><p>The app freezes for a moment while the hook is installed, then shows “ytps5: hook installed”.</p></div></li>
+      <li><div><b>Wait for the toast</b><p>You should see “ytps5: waiting for PPSA01652” (or your configured title).</p></div></li>
+      <li><div><b>Open the configured app</b><p><code>PPSA01652</code> by default. It freezes for a moment while the hook is installed, then shows “ytps5: hook installed”.</p></div></li>
       <li><div><b>Optional: add it to autoload</b><p>Payload Manager: add <code>ytps5.elf</code> to <code>autoload.txt</code>. etaHEN: add it to the payload autoload list.</p></div></li>
     </ol>
   </div>
 </section>
 
-<section id="how">
+<section id="config">
   <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">App selection</div>
+      <h2>Choose which app to patch.</h2>
+      <p>On first run, ytps5 writes a commented config file. Keep the Y2JB app for Y2JB and patch the clean player.</p>
+    </div>
+    <pre><code># /data/ytps5-sponsorblock/config.txt
+patch_title=PPSA01652   # PPSA01650 | PPSA01651 | PPSA01652 | AUTO
+allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
+    <ul style="color:var(--muted);line-height:1.8">
+      <li><strong style="color:var(--text)">Y2JB on <code>PPSA01650</code>, patch the clean player:</strong> <code>patch_title=PPSA01652</code> (default).</li>
+      <li><strong style="color:var(--text)">Y2JB on <code>PPSA01651</code>, patch <code>PPSA01650</code>:</strong> <code>patch_title=PPSA01650</code> and <code>allow_y2jb=1</code>.</li>
+      <li><strong style="color:var(--text)">Patch whichever <code>PPSA0165x</code> appears:</strong> <code>patch_title=AUTO</code>. Y2JB titles are still refused unless <code>allow_y2jb=1</code>.</li>
+    </ul>
+    <p style="color:var(--faint);font-size:14px;margin-top:14px">Edit the file over FTP (port <code>2121</code>) or the console file manager, then restart <code>ytps5.elf</code>. Patching a Y2JB app can break the jailbreak/autoload chain; only opt in if you have a second clean app for Y2JB.</p>
+  </div>
+</section>
+
+<section id="how">  <div class="wrap">
     <div class="section-head">
       <div class="kicker">Under the hood</div>
       <h2>A prologue patch, not a package mod.</h2>
@@ -308,7 +328,7 @@
       </details>
       <details>
         <summary>Will it work on PPSA01650 or PPSA01651?</summary>
-        <div class="answer"><p>No. Those are commonly used as Y2JB daily drivers, and the tool deliberately refuses to patch them. Use a clean app such as <code>PPSA01652</code>.</p></div>
+        <div class="answer"><p>Not by default. Those are commonly used as Y2JB daily drivers and are refused unless you set <code>patch_title</code> to one of them and <code>allow_y2jb=1</code> in <code>/data/ytps5-sponsorblock/config.txt</code>. The recommended setup is to leave the Y2JB app alone and patch a clean app such as <code>PPSA01652</code>.</p></div>
       </details>
       <details>
         <summary>Does it support SponsorBlock?</summary>
@@ -339,7 +359,7 @@
         <li>This project contains <strong>no</strong> app packages, console keys, DRM bypass tooling, or copyrighted app files.</li>
         <li>It does not modify the installed app package. The patch exists only in the running process's memory and disappears when the app or console restarts.</li>
         <li>It is intended for research, education, and personal use on hardware you own and control. Check the laws and terms that apply to you.</li>
-        <li>The tool deliberately refuses <code>PPSA01650</code> and <code>PPSA01651</code> because those are commonly used as Y2JB daily drivers.</li>
+        <li>The tool refuses <code>PPSA01650</code> and <code>PPSA01651</code> by default because those are commonly used as Y2JB daily drivers. Patching them requires an explicit <code>allow_y2jb=1</code> opt-in and is unsupported.</li>
         <li>SponsorBlock is an independent community service. This project only calls its public API.</li>
         <li>Not affiliated with Sony, Google, YouTube, SponsorBlock, or any app vendor. No warranty; use at your own risk.</li>
       </ul>

@@ -47,7 +47,7 @@
     <ul>
       <li><code>ytps5.elf</code> — the single-file installer. It embeds the proxy and injector and hands both to the console's own <code>elfldr</code> on <code>127.0.0.1:9021</code>.</li>
       <li><strong>Proxy</strong> (<code>injector/dump_server.c</code>) — a small local HTTP service on port <code>4040</code>. It fetches SponsorBlock data and <code>version.json</code> over HTTPS.</li>
-      <li><strong>Injector</strong> (<code>injector/main.cpp</code>) — attaches to the clean app process, finds <code>HTMLScriptExecute</code>, installs a trampoline and hook, and stays resident.</li>
+      <li><strong>Injector</strong> (<code>injector/main.cpp</code>) — reads <code>config.txt</code>, attaches to the selected app process, finds <code>HTMLScriptExecute</code>, installs a trampoline and hook, and stays resident.</li>
       <li><strong>Hook</strong> (<code>injector/direct_hook.c</code>) — a tiny position-independent blob that prepends the JavaScript payload to each script.</li>
       <li><strong>Payload</strong> (<code>payload/inject.src.js</code>, minified to <code>payload/inject.js</code>) — ad filtering, SponsorBlock skipping, the settings panel, and update checks.</li>
     </ul>
@@ -55,7 +55,7 @@
     <h2>Flow</h2>
     <ol>
       <li>The installer sends the proxy and injector to <code>elfldr</code>.</li>
-      <li>The injector waits for a <code>PPSA0165x</code> app. It refuses <code>PPSA01650</code>/<code>PPSA01651</code> (Y2JB daily drivers) and waits for a clean title.</li>
+      <li>The injector reads <code>/data/ytps5-sponsorblock/config.txt</code> and waits for the selected title (default <code>PPSA01652</code>). <code>PPSA01650</code>/<code>PPSA01651</code> are refused unless <code>allow_y2jb=1</code>.</li>
       <li>It attaches with libhijacker, finds <code>HTMLScriptExecute</code>, and makes the target page writable from the kernel side.</li>
       <li>It installs a <code>scePadRead</code> GOT trigger. On the next controller poll, the trigger applies the <code>HTMLScriptExecute</code> prologue patch from inside the app's own input loop, avoiding a race with a live script call.</li>
       <li>The <code>HTMLScriptExecute</code> hook calls a trampoline containing the original prologue, then calls the original function with a combined string:</li>
@@ -66,6 +66,16 @@
       <li>The JavaScript runs in the page context and is idempotent. It filters ad objects from API responses, watches the video element, fetches SponsorBlock segments through the local proxy, and skips matching segments.</li>
       <li>The injector stays resident. When the app closes, it waits for the next launch and patches the new process.</li>
     </ol>
+
+    <h2>App selection</h2>
+    <p>On first run the injector writes <code>/data/ytps5-sponsorblock/config.txt</code>:</p>
+    <pre><code>patch_title=PPSA01652   # PPSA01650 | PPSA01651 | PPSA01652 | AUTO
+allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
+    <p>
+      The file is read once at startup. Restart <code>ytps5.elf</code> after
+      editing it. The Y2JB daily drivers are refused unless
+      <code>allow_y2jb=1</code>.
+    </p>
 
     <h2>Settings</h2>
     <p>
@@ -85,7 +95,7 @@
 
     <h2>Limits</h2>
     <ul>
-      <li>Tested only on firmware 8.20 with <code>PPSA01652</code>.</li>
+      <li>Tested only on firmware 8.20 with <code>PPSA01652</code>. Patching a Y2JB title is unsupported.</li>
       <li>The <code>HTMLScriptExecute</code> signature is matched against the tested app build. A store update can change it.</li>
       <li>The patch is memory-only and is cleared by a console reboot or app exit. The resident injector re-patches app launches; after a reboot, run the installer again or use autoload.</li>
       <li>No app packages, console keys, DRM tools, or copyrighted files are distributed.</li>

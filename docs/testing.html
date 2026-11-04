@@ -43,8 +43,9 @@
       app <code>PPSA01652</code>.
     </p>
     <div class="notice">
-      <strong>Do not test on <code>PPSA01650</code>/<code>PPSA01651</code>.</strong>
-      Those are Y2JB daily drivers and the injector deliberately refuses them.
+      <strong><code>PPSA01650</code>/<code>PPSA01651</code> are Y2JB daily drivers.</strong>
+      They are refused by default; set <code>allow_y2jb=1</code> only if a second
+      app handles Y2JB. Keep the default test on <code>PPSA01652</code>.
     </div>
 
     <h2>Build</h2>
@@ -57,8 +58,8 @@ make installer</code></pre>
     <h2>Install</h2>
     <ol>
       <li>Upload <code>ytps5-installer.elf</code> in Payload Manager (or place it in the local payloads folder) and run it.</li>
-      <li>Confirm the toast <strong>“ytps5: waiting for the supported app”</strong>.</li>
-      <li>Open <code>PPSA01652</code>.</li>
+      <li>Confirm the toast <strong>“ytps5: waiting for PPSA01652”</strong> (or your configured title).</li>
+      <li>Open <code>PPSA01652</code> (or the configured title).</li>
       <li>Expect a short freeze, then <strong>“ytps5: hook installed”</strong> and <strong>“N script(s) injected”</strong>.</li>
     </ol>
 
@@ -73,6 +74,9 @@ make installer</code></pre>
       <li>SponsorBlock finds and skips a known segment.</li>
       <li>Close and reopen the app; it is patched automatically without rerunning the installer.</li>
       <li>Run the installer on a clean boot; it starts the proxy and injector.</li>
+      <li>Config: <code>/data/ytps5-sponsorblock/config.txt</code> is created with comments.</li>
+      <li>Config: changing <code>patch_title</code> and restarting the injector targets the new app.</li>
+      <li>Config: a Y2JB title with <code>allow_y2jb=0</code> falls back to <code>PPSA01652</code>.</li>
     </ul>
 
     <h2>Logs</h2>

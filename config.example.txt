@@ -1,0 +1,30 @@
+# ytps5-sponsorblock - which PS5 video app should ytps5 patch?
+#
+# These are title IDs, not files. Choose ONE app to patch.
+#
+#   PPSA01650  Y2JB daily driver  -> leave it for Y2JB
+#   PPSA01651  Y2JB daily driver  -> leave it for Y2JB
+#   PPSA01652  clean player       -> recommended, used for ytps5
+#
+# Example: Y2JB uses PPSA01650 and you patch the clean player:
+#   patch_title=PPSA01652
+#
+# Example: Y2JB uses PPSA01651 and you want to patch PPSA01650:
+#   patch_title=PPSA01650
+#   allow_y2jb=1
+#
+# ytps5 refuses PPSA01650/PPSA01651 by default so it cannot break Y2JB.
+# Set allow_y2jb=1 only if you are sure the chosen app is not the one
+# your jailbreak/autoload depends on.
+#
+# AUTO patches whichever PPSA0165x app appears first, but still refuses
+# the Y2JB titles unless allow_y2jb=1.
+#
+# This is a template. The injector creates the real file at
+# /data/ytps5-sponsorblock/config.txt on the console.
+
+patch_title=PPSA01652
+
+# 0 = refuse the Y2JB daily drivers (safe, default)
+# 1 = allow patching PPSA01650/PPSA01651
+allow_y2jb=0

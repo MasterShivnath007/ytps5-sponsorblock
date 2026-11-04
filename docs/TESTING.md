@@ -3,8 +3,10 @@
 Test target: **PS5 firmware 8.20**, Y2JB + Relapse, etaHEN with FTP on `2121`
 and `elfldr` on `9021`, clean app **`PPSA01652`**.
 
-Do **not** test on `PPSA01650`/`PPSA01651`; those are Y2JB daily drivers and the
-injector deliberately refuses them.
+`PPSA01650`/`PPSA01651` are Y2JB daily drivers and are refused by default. To
+test patching one of them, set `allow_y2jb=1` in
+`/data/ytps5-sponsorblock/config.txt` and only use a console where the other app
+handles Y2JB. Keep the default setup on `PPSA01652`.
 
 ## Build
 
@@ -21,7 +23,8 @@ make installer
 
 1. Upload `ytps5-installer.elf` in Payload Manager (or place it in the local
    payloads folder) and run it.
-2. Confirm the toast **“ytps5: waiting for the supported app”**.
+2. Confirm the toast **“ytps5: waiting for PPSA01652”** (or your configured
+   title).
 3. Open `PPSA01652`.
 4. Expect a short freeze, then **“ytps5: hook installed”** and
    **“N script(s) injected”**.
@@ -38,6 +41,14 @@ make installer
 - [ ] Close and reopen the app; it is patched automatically without rerunning
       the installer.
 - [ ] Run the installer on a clean boot; it starts the proxy and injector.
+
+## App selection checks
+
+- [ ] `/data/ytps5-sponsorblock/config.txt` exists and contains the comments.
+- [ ] Changing `patch_title` and restarting the injector targets the new app.
+- [ ] `patch_title` set to a Y2JB title with `allow_y2jb=0` falls back to
+      `PPSA01652` and logs `using PPSA01652`.
+- [ ] `allow_y2jb=1` allows the selected Y2JB title.
 
 ## Logs
 

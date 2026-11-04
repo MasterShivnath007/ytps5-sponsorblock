@@ -26,9 +26,10 @@ when the app or console restarts.
   access content you are not authorized to access.
 - Do not ask for or share app packages, keys, or DRM tools in this repository's
   issues or discussions.
-- The project deliberately refuses `PPSA01650`/`PPSA01651` because those are
-  commonly used as Y2JB daily drivers. Use a clean app for patching. You are
-  responsible for any changes you make to your own setup.
+- The project refuses `PPSA01650`/`PPSA01651` by default because those are
+  commonly used as Y2JB daily drivers. Patching one of them requires an explicit
+  `allow_y2jb=1` opt-in in `/data/ytps5-sponsorblock/config.txt` and is
+  unsupported. You are responsible for any changes you make to your own setup.
 
 ## No warranty
 

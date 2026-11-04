@@ -19,23 +19,47 @@ already own and patches the running process in memory.
 > YouTube, SponsorBlock, or any app vendor. No app packages, keys, DRM bypass
 > tools, or copyrighted content are distributed. You must already own the app.
 > **Tested only on PS5 firmware 8.20 with the clean app `PPSA01652`.** Use at
-> your own risk; no warranty. Do not use this with the Y2JB apps
-> `PPSA01650`/`PPSA01651`.
+> your own risk; no warranty. The Y2JB apps `PPSA01650`/`PPSA01651` are refused
+> by default; patching them requires an explicit opt-in.
 
 ## Compatibility
 
 | App | Role | Status |
 | --- | --- | --- |
-| `PPSA01650` | Y2JB daily driver | 🔴 **Never patch.** The tool refuses. |
-| `PPSA01651` | Y2JB daily driver | 🔴 **Never patch.** The tool refuses. |
-| `PPSA01652` | Clean player | 🟢 **Recommended.** Tested on FW 8.20. |
-| other `PPSA0165x` | Native PS5 app | 🟡 Untested. The tool may allow it, but signatures can differ. |
+| `PPSA01650` | Y2JB daily driver | 🔴 **Leave for Y2JB.** Refused by default; opt in with `allow_y2jb=1`. |
+| `PPSA01651` | Y2JB daily driver | 🔴 **Leave for Y2JB.** Refused by default; opt in with `allow_y2jb=1`. |
+| `PPSA01652` | Clean player | 🟢 **Recommended.** Tested on FW 8.20; the default target. |
+| other `PPSA0165x` | Native PS5 app | 🟡 Untested. Select with `patch_title=AUTO`. |
 | `CUSA01116` | PS4-compatibility app | ⚪ Unsupported. |
 
-The injector detects the title it is about to patch. For `PPSA01650`/`PPSA01651`
-it shows **“Y2JB app — NOT patching”** and waits. For a clean title it shows
-**“clean — patching”**. Nothing writes to app save data, `download0.dat`, or the
-Y2JB autoloader.
+Which app gets patched is controlled by `/data/ytps5-sponsorblock/config.txt`
+(created on first run). The default is `PPSA01652`. The injector still refuses
+`PPSA01650`/`PPSA01651` unless you explicitly set `allow_y2jb=1`, because those
+are commonly used as Y2JB daily drivers. Nothing writes to app save data,
+`download0.dat`, or the Y2JB autoloader.
+
+### Choosing which app to patch
+
+The injector writes a commented config file on first run:
+
+```ini
+# /data/ytps5-sponsorblock/config.txt
+patch_title=PPSA01652   # PPSA01650 | PPSA01651 | PPSA01652 | AUTO
+allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651
+```
+
+- **Keep Y2JB on `PPSA01650` and patch the clean player:** `patch_title=PPSA01652`
+  (default).
+- **Keep Y2JB on `PPSA01651` and patch `PPSA01650`:** set
+  `patch_title=PPSA01650` and `allow_y2jb=1`.
+- **Patch whichever `PPSA0165x` app appears first:** `patch_title=AUTO`. Y2JB
+  titles are still refused unless `allow_y2jb=1`.
+
+Edit the file over FTP (port `2121`) or with the console's file manager, then
+restart `ytps5.elf` so the injector re-reads it.
+
+> Patching a Y2JB app can break the jailbreak/autoload chain. Only enable
+> `allow_y2jb=1` if you have a second clean app for Y2JB.
 
 ## What you get
 
@@ -58,9 +82,10 @@ Y2JB autoloader.
 2. Copy it to the console or a USB drive.
 3. On the console, open **Payload Manager** → local payloads → upload/add
    `ytps5.elf` → run it.
-4. Wait for the **“ytps5: waiting for the supported app”** toast.
-5. Open the clean app (`PPSA01652`). It will freeze for a moment while the hook
-   is installed, then show **“ytps5: hook installed”**.
+4. Wait for the **“ytps5: waiting for PPSA01652”** toast (or your configured
+   title).
+5. Open the configured app (`PPSA01652` by default). It will freeze for a
+   moment while the hook is installed, then show **“ytps5: hook installed”**.
 
 The single ELF embeds the onboarding proxy and the injector. It only uses
 network loopback to hand the real payloads to the console's own `elfldr`, so it
@@ -101,9 +126,9 @@ roadmap for the next update.
 
 ```json
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "url": "https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest",
-  "notes": "Update mirror fallback and latest fixes"
+  "notes": "Per-app selection via /data/ytps5-sponsorblock/config.txt"
 }
 ```
 
@@ -126,7 +151,10 @@ Common issues:
 - **SponsorBlock not skipping:** the local proxy must be running on port `4040`.
   The single installer starts it automatically.
 - **App stuck on the launch screen:** reboot, rerun `ytps5.elf`, and open the
-  clean app. Do not try to patch a Y2JB app.
+  configured app. If you enabled `allow_y2jb=1`, set it back to `0` and use a
+  clean app.
+- **Wrong app patched or nothing patched:** check `config.txt`; the injector
+  waits for the exact `patch_title`. Restart `ytps5.elf` after editing it.
 - **Update toast never appears:** `version.json` is fetched from `main`; make
   sure it is present and the console has network access.
 
@@ -157,7 +185,8 @@ header automatically.
 ## How it works (short version)
 
 1. The installer hands the proxy and injector to the console's `elfldr`.
-2. The injector attaches to the clean app process with libhijacker.
+2. The injector attaches to the app selected in `config.txt` (default
+   `PPSA01652`) with libhijacker.
 3. It installs a 14-byte jump on `HTMLScriptExecute` using a trampoline, and a
    tiny position-independent hook that prepends the JavaScript payload to
    scripts as they execute.
@@ -233,8 +262,10 @@ in memory. It does not run on stock firmware.
 Yes. It is GPL-3.0, with no paywalled features, account, or telemetry.
 
 ### Will it work on PPSA01650 or PPSA01651?
-No. Those are commonly used as Y2JB daily drivers, and the tool deliberately
-refuses to patch them. Use a clean app such as `PPSA01652`.
+Not by default. Those are commonly used as Y2JB daily drivers and are refused
+unless you set `patch_title` to one of them and `allow_y2jb=1` in
+`/data/ytps5-sponsorblock/config.txt`. The recommended setup is to leave the
+Y2JB app alone and patch a clean app such as `PPSA01652`.
 
 ### Does it support SponsorBlock?
 Yes. SponsorBlock segments are fetched from the public API through the local
@@ -263,8 +294,9 @@ In short:
   running process's memory and disappears when the app or console restarts.
 - The project is intended for research, education, and personal use on hardware
   you own and control. Check the laws and terms that apply to you.
-- The tool deliberately refuses `PPSA01650` and `PPSA01651` because those are
-  commonly used as Y2JB daily drivers. Use a clean app for patching.
+- The tool refuses `PPSA01650` and `PPSA01651` by default because those are
+  commonly used as Y2JB daily drivers. Patching them requires an explicit
+  `allow_y2jb=1` opt-in and is unsupported.
 - SponsorBlock is an independent community service. This project only calls its
   public API.
 

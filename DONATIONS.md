@@ -22,8 +22,8 @@ The repository Sponsor button is configured in `.github/FUNDING.yml`.
 
 - It does not remove the GPL-3.0 license or make the public code private.
 - It does not add telemetry, ads, or a mandatory account.
-- It does not change the safety rules: `PPSA01650`/`PPSA01651` (Y2JB apps) remain
-  unsupported for patching.
+- It does not change the safety defaults: `PPSA01650`/`PPSA01651` (Y2JB apps)
+  are refused unless you explicitly set `allow_y2jb=1`.
 
 Sponsorship is a thank-you, not a subscription to the software. The public
 build stays free. If you need an invoice or a payment method other than these

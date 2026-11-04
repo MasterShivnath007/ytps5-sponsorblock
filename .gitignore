@@ -39,3 +39,6 @@ Tutorial-*.mp4
 # Generated direct-hook / embedded headers
 injector/direct_hook_blob.h
 injector/embedded_blobs.h
+
+# Local video exports (large; upload them, do not commit)
+youtube/*.mp4

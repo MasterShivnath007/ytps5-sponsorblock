@@ -1,0 +1,54 @@
+1
+00:00:00,000 --> 00:00:04,600
+YouTube on your PS5. With zero ads.
+Here is the whole setup.
+
+2
+00:00:04,600 --> 00:00:08,200
+Firmware 8.20. The YouTube app you
+already own. Nothing else needed.
+
+3
+00:00:08,200 --> 00:00:15,000
+One file — ytps5.elf. Add it in Payload
+Manager like any other payload.
+
+4
+00:00:15,000 --> 00:00:24,000
+Put it in autoload, so you only do this
+once. It lasts until the next full reboot.
+
+5
+00:00:24,000 --> 00:00:31,000
+Run it. It waits for the YouTube app,
+then patches it in memory.
+
+6
+00:00:31,000 --> 00:00:39,000
+That is it. No package to install.
+No second app. No app replacement.
+
+7
+00:00:39,000 --> 00:00:43,400
+Open YouTube exactly like before.
+
+8
+00:00:43,400 --> 00:00:48,100
+Pick any video. No pre-roll, no mid-roll.
+Sponsor segments skip themselves.
+
+9
+00:00:48,100 --> 00:00:54,100
+Settings live inside the app: Ad Block
+and SponsorBlock, both on.
+
+10
+00:00:54,100 --> 00:01:03,000
+And it is not tied to one app version.
+Edit config.txt to pick which YouTube
+build gets patched.
+
+11
+00:01:03,000 --> 00:01:07,800
+Free, open source, one file.
+Link in the description.

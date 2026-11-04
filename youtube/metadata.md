@@ -126,6 +126,20 @@ Chapters need three or more entries, each at least 10 seconds, starting at
 320 px wide. No YouTube logo, no Sony logo, no play button: the word "YouTube"
 appears once as plain text, which is descriptive use.
 
+## Shorts thumbnail
+
+YouTube only allows a **custom uploaded** Shorts thumbnail for channels in the
+YouTube Partner Program (rolled out 24 July 2026), and the account must be
+verified. A brand-new channel usually sees the option greyed out or missing.
+
+- If the option is available: `docs/media/short-thumbnail.png` (1080×1920, 9:16).
+- If not: pick a frame instead — Studio → Content → **Shorts** → pencil →
+  Thumbnail → choose one of the suggested frames. In the phone app:
+  Your videos → ⋮ → Edit → tap the thumbnail → slide to the frame.
+
+The Short opens on the "NO ADS." caption card, so its first frame already works
+as a thumbnail.
+
 ## Upload checklist
 
 - [ ] Title pasted

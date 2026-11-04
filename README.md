@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/social.png" alt="ytps5 — block YouTube ads and skip sponsor segments in the official PS5 video app" width="100%">
+  <img src="docs/media/hero.png" alt="ytps5 — no ads on YouTube for PS5, not once in any video" width="100%">
 </p>
 
 # ytps5

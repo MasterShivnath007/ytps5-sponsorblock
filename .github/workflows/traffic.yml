@@ -26,13 +26,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Snapshot traffic
+      # The default token cannot read traffic, and a red or noisy run every day
+      # helps nobody. The local LaunchAgent covers traffic in the meantime; with
+      # a TRAFFIC_TOKEN secret this job becomes self-sufficient.
+      - name: Check for TRAFFIC_TOKEN
+        id: token
         env:
-          GITHUB_TOKEN: ${{ secrets.TRAFFIC_TOKEN || secrets.GITHUB_TOKEN }}
+          T: ${{ secrets.TRAFFIC_TOKEN }}
+        run: |
+          if [ -z "$T" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No TRAFFIC_TOKEN secret; skipping. Add one with:"
+            echo "  gh auth token | gh secret set TRAFFIC_TOKEN"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Snapshot traffic
+        if: steps.token.outputs.skip != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
           GH_REPO: ${{ github.repository }}
         run: python3 scripts/snapshot_traffic.py
 
       - name: Commit
+        if: steps.token.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

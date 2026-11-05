@@ -37,7 +37,6 @@ jobs:
         run: |
           mkdir -p dist
           cp build/ytps5-injector.elf dist/
-          cp build/sponsorblock.so dist/
           cp payload/inject.js dist/
           cp -R tools dist/
           cp README.md LICENSE THIRD_PARTY_NOTICES.md dist/
@@ -48,6 +47,5 @@ jobs:
           name: ytps5-sponsorblock
           path: |
             build/ytps5-injector.elf
-            build/sponsorblock.so
             payload/inject.js
             ytps5-sponsorblock.zip

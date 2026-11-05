@@ -24,8 +24,6 @@ second homebrew app, no package, no app replacement.
 
 **Website:** https://mastershivnath007.github.io/ytps5-sponsorblock/
 
-**New to the technical side?** [Read the plain-English guide (PDF, 13 pages)](https://mastershivnath007.github.io/ytps5-sponsorblock/ytps5-explained.pdf) — what the app really is, how a hook works, and why firmware matters, with no programming knowledge assumed.
-
 ## Install in two minutes
 
 **You need:** a jailbroken PS5 on **firmware 8.20**, the YouTube app

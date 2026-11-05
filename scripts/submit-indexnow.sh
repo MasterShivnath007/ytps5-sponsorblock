@@ -36,4 +36,4 @@ echo "Submitting ${#urls[@]} URLs to IndexNow..."
 curl -sS -o /tmp/indexnow.out -w 'HTTP %{http_code}\n' \
   -H 'Content-Type: application/json; charset=utf-8' \
   -d "$payload" https://api.indexnow.org/indexnow
-[ -s /tmp/indexnow.out ] && cat /tmp/indexnow.out && echo
+if [ -s /tmp/indexnow.out ]; then cat /tmp/indexnow.out; echo; fi

@@ -28,6 +28,13 @@ PS5 payload SDK's own `crt/kernel.c` table (`0x11400000` case) and
 etaHEN-Plugins stops at 10.60, which is why the unpatched build could not
 attach on 11.40.
 
+**Second local patch:** the process walk and root-vnode lookup now use the
+payload SDK's runtime `KERNEL_ADDRESS_ALLPROC` / `KERNEL_ADDRESS_ROOTVNODE`
+values (and `KERNEL_OFFSET_PROC_P_*` for the proc fields) instead of the
+static table, so the payload follows whichever firmware the SDK supports.
+The static table remains only as a diagnostic fallback and now covers
+1.00 through 13.60.
+
 ## PS5 payload SDK
 
 - Not vendored; install it separately.

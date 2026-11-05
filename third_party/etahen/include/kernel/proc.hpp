@@ -103,12 +103,12 @@ class FdTbl {
 
 class KProc : public KernelObject<KProc, PROC_SIZE> {
 
-	static constexpr size_t UCRED_OFFSET = 0x40;
+	/* The SDK fills KERNEL_OFFSET_PROC_P_* for the running firmware.
+	 * The remaining fields are stable across 1.00-13.60 in libhijacker
+	 * and are kept here, with sanity checks at the call sites. */
 	static constexpr size_t PATH_OFFSET = 0x3d8;
 	static constexpr size_t SHARED_OBJECT_OFFSET = 0x3e8;
-	static constexpr size_t PID_OFFSET = 0xbc;
 	static constexpr size_t THREADS_OFFSET = 0x10;
-	static constexpr size_t FD_OFFSET = 0x48;
 	static constexpr size_t TITLEID_OFFSET = 0x470;
 	static constexpr size_t SELFINFO_OFFSET = 0x588;
 	static constexpr size_t SELFINFO_NAME_OFFSET = 0x59C;
@@ -117,7 +117,7 @@ class KProc : public KernelObject<KProc, PROC_SIZE> {
 
 		KProc(uintptr_t addr) : KernelObject(addr) {}
 		uintptr_t p_ucred() const {
-			return get<uintptr_t, UCRED_OFFSET>();
+			return getAt<uintptr_t>((size_t)KERNEL_OFFSET_PROC_P_UCRED);
 		}
 
 		UniquePtr<KUcred> ucred() const {
@@ -125,7 +125,7 @@ class KProc : public KernelObject<KProc, PROC_SIZE> {
 		}
 
 		int p_pid() const {
-			return get<int, PID_OFFSET>();
+			return getAt<int>((size_t)KERNEL_OFFSET_PROC_P_PID);
 		}
 
 		int pid() const {
@@ -159,7 +159,7 @@ class KProc : public KernelObject<KProc, PROC_SIZE> {
 		}
 
 		uintptr_t p_fd() const {
-			return get<uintptr_t, FD_OFFSET>();
+			return getAt<uintptr_t>((size_t)KERNEL_OFFSET_PROC_P_FD);
 		}
 
 		FdTbl getFdTbl() const {
@@ -196,7 +196,8 @@ class KProc : public KernelObject<KProc, PROC_SIZE> {
 };
 
 inline KIterator<KProc> getAllProcs() {
-	return {kernel_base + offsets::allproc()};
+	/* Absolute address resolved by the SDK at startup. */
+	return {(uintptr_t)KERNEL_ADDRESS_ALLPROC};
 }
 
 UniquePtr<KProc> getProc(int pid);

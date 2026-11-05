@@ -20,19 +20,23 @@ extern "C" int mdbg_call(void *, void *, void *);
 extern "C" int sceKernelDlsym(int handle, const char* symbol, void** addrp);
 extern "C" int *__error();
 
-static constexpr uintptr_t PID_OFFSET = 0xBC;
-static constexpr uintptr_t UCRED_OFFSET = 0x40;
+/* Last error from a debugger write; read by the injector for diagnostics. */
+extern "C" int ytps5_dbg_write_errno = -1;
+
+static constexpr int PROC_WALK_LIMIT = 4096;
 
 static uintptr_t getCurrentProc() {
 
 	const pid_t pid = getpid();
-	uintptr_t proc = kread<uintptr_t>(kernel_base + offsets::allproc());
-	while (proc != 0) {
-		int cid = kread<int>(proc + PID_OFFSET);
+	uintptr_t proc = KERNEL_ADDRESS_ALLPROC;
+	for (int i = 0; i < PROC_WALK_LIMIT && proc != 0; ++i) {
+		int cid = kread<int>(proc + (uintptr_t)KERNEL_OFFSET_PROC_P_PID);
 		if (cid == pid) {
 			return proc;
 		}
-		proc = kread<uintptr_t>(proc);
+		uintptr_t next = kread<uintptr_t>(proc);
+		if (next == proc) break;
+		proc = next;
 	}
 	return 0;
 }
@@ -134,16 +138,18 @@ bool write(int pid, uintptr_t dst, const void *src, size_t length) {
 	mdbg_call(arg1, arg2, arg3);
 	if (arg3.length != length) {
 		int err = arg3.err != -1 ? (int) arg3.err : errno;
+		ytps5_dbg_write_errno = err;
 		printf("write failed %d: %s\n", err, strerror(err));
 		return false;
 	}
+	ytps5_dbg_write_errno = 0;
 	return true;
 }
 
 uint64_t setAuthId(uint64_t authid) {
 	static constexpr int AUTHID_OFFSET = 0x58;
 	uintptr_t proc = getCurrentProc();
-	uintptr_t ucred = kread<uintptr_t>(proc + UCRED_OFFSET);
+	uintptr_t ucred = kread<uintptr_t>(proc + (uintptr_t)KERNEL_OFFSET_PROC_P_UCRED);
 	uint64_t id = kread<uint64_t>(ucred + AUTHID_OFFSET);
 	kwrite(ucred + AUTHID_OFFSET, authid);
 	return id;

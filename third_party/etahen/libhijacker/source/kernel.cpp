@@ -22,10 +22,22 @@ String getKernelString(uintptr_t addr) {
 }
 
 UniquePtr<KProc> getProc(int pid) {
-	for (auto p : getAllProcs()) {
-		if (pid == p->pid()) {
-			return p.release();
+	/* Bounded walk: a bad pointer on unknown firmware must fail, not hang. */
+	uintptr_t proc = KERNEL_ADDRESS_ALLPROC;
+	for (int i = 0; i < 4096 && proc != 0; ++i) {
+		int cid = kread<int>(proc + (uintptr_t)KERNEL_OFFSET_PROC_P_PID);
+		if (pid == cid) {
+			UniquePtr<KProc> found{new KProc{proc}};
+			/* Re-read through the struct: a wrong struct size or offset
+			 * must fail here, not after we start writing. */
+			if (found->pid() != pid) {
+				return nullptr;
+			}
+			return found;
 		}
+		uintptr_t next = kread<uintptr_t>(proc);
+		if (next == proc) break;
+		proc = next;
 	}
 	return nullptr;
 }

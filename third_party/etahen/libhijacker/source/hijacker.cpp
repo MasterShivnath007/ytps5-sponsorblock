@@ -71,7 +71,7 @@ void Hijacker::jailbreak(bool escapeSandbox) const {
 		return;
 	}
 	UniquePtr<uint8_t[]> rootvnode_area_store{new uint8_t[0x100]};
-	kernel_copyout(kernel_base + offsets::root_vnode(), rootvnode_area_store.get(), 0x100);
+	kernel_copyout(KERNEL_ADDRESS_ROOTVNODE, rootvnode_area_store.get(), 0x100);
 	uint32_t uid_store = 0;
 	uint32_t ngroups_store = 0;
 	uint64_t authid_store = 0x4801000000000013l;

@@ -99,6 +99,14 @@ class KernelObject {
 			return *(T *)(buf + offset);
 		}
 
+		/* Same as get(), but for offsets the payload SDK discovers at
+		 * runtime (KERNEL_OFFSET_PROC_*). Returns T{} if out of range. */
+		template<typename T>
+		T getAt(size_t offset) const {
+			if (offset + sizeof(T) > size) return T{};
+			return *(T *)(buf + offset);
+		}
+
 		template<const unsigned long offset, typename T>
 		void set(T value) {
 			static_assert(offset < size, "offset >= size");

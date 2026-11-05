@@ -6,6 +6,7 @@
  * sponsorblock.so inside the app process.
  */
 #include <cctype>
+#include <cerrno>
 #include <cstddef>
 #include <stdarg.h>
 #include <stdint.h>
@@ -54,6 +55,7 @@ static bool g_allow_y2jb = false;
 static bool is_y2jb_title(const char *tid);
 
 extern "C" int sceKernelDebugOutText(int channel, const char *text);
+extern "C" int ytps5_dbg_write_errno;
 
 static void log_open() {
   mkdir(LOG_DIR, 0777);
@@ -492,6 +494,81 @@ static bool find_pad_got(Hijacker *h, uintptr_t &got) {
 }
 
 /*
+ * Write one blob into the app and report exactly what happened.
+ *
+ * Some firmware maps the allocator's pages read-only or non-executable. The
+ * debugger write is rejected there, which looks like a generic "write failed".
+ * Try the write, then mprotect the exact pages and retry, then fall back to
+ * the SDK's kernel-side copy. Every attempt is logged so a remote tester's
+ * log tells us which step failed and why.
+ */
+static bool write_region(Hijacker *h, int pid, const char *what,
+                         uintptr_t addr, const void *src, size_t len,
+                         int prot) {
+  const uintptr_t page = 0x1000;
+  uintptr_t page_start = addr & ~(page - 1);
+  uintptr_t page_end = (addr + len + page - 1) & ~(page - 1);
+  size_t span = page_end - page_start;
+
+  uint8_t probe[8] = {0};
+  bool readable = h->read(addr, probe, sizeof(probe));
+  int prot_now = kernel_get_vmem_protection(pid, (intptr_t)page_start, span);
+
+  /* Chunk the transfer: debugger writes have a per-call limit on some
+   * firmware, and a 13 KB blob is well past it. */
+  const size_t chunk = 0x1000;
+  int mprotect_rc = -1;
+  int fail_err = 0;
+  int fail_copyin = -999;
+  bool all_ok = true;
+
+  for (size_t off = 0; off < len; off += chunk) {
+    size_t n = len - off < chunk ? len - off : chunk;
+    const uint8_t *part = (const uint8_t *)src + off;
+
+    ytps5_dbg_write_errno = -1;
+    bool ok = h->write(addr + off, part, n);
+    int err = ytps5_dbg_write_errno;
+
+    if (!ok) {
+      if (mprotect_rc < 0) {
+        mprotect_rc = kernel_mprotect(pid, (intptr_t)page_start, span, prot);
+      }
+      ytps5_dbg_write_errno = -1;
+      ok = h->write(addr + off, part, n);
+      err = ytps5_dbg_write_errno;
+    }
+
+    if (!ok) {
+      int crc = kernel_proc_copyin(pid, part, (intptr_t)(addr + off), n);
+      ok = (crc == 0);
+      if (!ok) {
+        all_ok = false;
+        fail_err = err;
+        fail_copyin = crc;
+        logf("write[%s] failed at offset 0x%zx of 0x%zx", what, off, len);
+        break;
+      }
+    }
+  }
+
+  bool verified = false;
+  if (all_ok) {
+    uint8_t check[8] = {0};
+    size_t n = len < sizeof(check) ? len : sizeof(check);
+    if (h->read(addr, check, n)) {
+      verified = memcmp(check, src, n) == 0;
+    }
+  }
+
+  logf("write[%s] addr=%p len=%zu read=%d prot=0x%x mprotect=%d "
+       "ok=%d err=%d copyin=%d verify=%d",
+       what, (void *)addr, len, readable, prot_now, mprotect_rc, all_ok,
+       fail_err, fail_copyin, verified);
+  return all_ok;
+}
+
+/*
  * Patch HTMLScriptExecute directly. No code is loaded through dlopen; the
  * injector writes a tiny position-independent hook and a trampoline into
  * executable memory that already belongs to the app.
@@ -512,6 +589,15 @@ static int run_direct_hook(Hijacker *h, int pid, const char *title) {
     suspended = true;
     logf("direct: app suspended for patching");
   }
+
+  auto *eboot = h->getEboot();
+  auto *text_sec = eboot ? eboot->getTextSection() : nullptr;
+  auto *data_sec = eboot ? eboot->getDataSection() : nullptr;
+  logf("sections: text=%p..%p data=%p..%p",
+       text_sec ? (void *)text_sec->start() : nullptr,
+       text_sec ? (void *)text_sec->end() : nullptr,
+       data_sec ? (void *)data_sec->start() : nullptr,
+       data_sec ? (void *)data_sec->end() : nullptr);
 
   notifyf("ytps5: scanning for hook target");
 
@@ -620,19 +706,28 @@ static int run_direct_hook(Hijacker *h, int pid, const char *title) {
   emit_abs_jmp(patch, hook_addr);
 
   bool html_wrote =
-      h->write(state_addr, &st, sizeof(st)) &&
-      h->write(state_addr + sizeof(Ytps5Direct), payload.data(), payload_len) &&
-      h->write(tramp_addr, tramp, tramp_len) &&
-      h->write(hook_addr, stub, sizeof(stub)) &&
-      h->write(blob_addr, ytps5_direct_blob, ytps5_direct_blob_len);
+      write_region(h, pid, "state", state_addr, &st, sizeof(st),
+                   PROT_READ | PROT_WRITE) &&
+      write_region(h, pid, "payload", state_addr + sizeof(Ytps5Direct),
+                   payload.data(), payload_len, PROT_READ | PROT_WRITE) &&
+      write_region(h, pid, "tramp", tramp_addr, tramp, tramp_len,
+                   PROT_READ | PROT_WRITE | PROT_EXEC) &&
+      write_region(h, pid, "hook", hook_addr, stub, sizeof(stub),
+                   PROT_READ | PROT_WRITE | PROT_EXEC) &&
+      write_region(h, pid, "blob", blob_addr, ytps5_direct_blob,
+                   ytps5_direct_blob_len, PROT_READ | PROT_WRITE | PROT_EXEC);
   if (!html_wrote) {
     logf("direct: html state/blob write failed (state=%p tramp=%p hook=%p)",
          (void *)state_addr, (void *)tramp_addr, (void *)hook_addr);
     notifyf("ytps5: write failed");
+    /* The target prologue is still untouched, so resuming is safe and the
+     * app does not stay frozen after a failure. */
+    resume_app();
     return 8;
   }
 
-  if (!h->write(target, patch, stolen)) {
+  if (!write_region(h, pid, "target", target, patch, stolen,
+                    PROT_READ | PROT_WRITE | PROT_EXEC)) {
     logf("direct: target write failed at %p", (void *)target);
     notifyf("ytps5: target write failed");
     return 8;
@@ -690,6 +785,7 @@ int main() {
 
   logf("ytps5 injector starting (pid=%d kernel_base=%p)", getpid(),
        (void *)kernel_base);
+  logf("build: fw-agnostic diag 2026-11-05 (SDK 1.00-13.60, write diagnostics)");
   logf("options probe=%d no_jailbreak=%d no_suspend=%d delay=%d", g_probe,
        g_no_jailbreak, g_no_suspend, g_attach_delay);
 
@@ -698,10 +794,27 @@ int main() {
        (void *)KERNEL_ADDRESS_TEXT_BASE, (void *)KERNEL_ADDRESS_ALLPROC);
   logf("payload pipes: rwpipe=%p rwpair=%p kpipe=%p",
        (void *)args->rwpipe, (void *)args->rwpair, (void *)args->kpipe_addr);
-  logf("libhijacker offsets: allproc=0x%zx security_flags=0x%zx "
-       "root_vnode=0x%zx qa_flags=0x%zx",
+  logf("table fallback (diagnostic only): allproc=0x%zx "
+       "security_flags=0x%zx root_vnode=0x%zx qa_flags=0x%zx",
        offsets::allproc(), offsets::security_flags(), offsets::root_vnode(),
        offsets::qa_flags());
+
+  /* The SDK resolves these per firmware at startup, so this build is not
+   * tied to one version. If it returns nothing, stop before touching
+   * memory instead of walking a bad pointer. */
+  const uint32_t sdk_fw = kernel_get_fw_version();
+  logf("sdk: fw=0x%x allproc=%p rootvnode=%p security=%p qa=%p",
+       sdk_fw, (void *)KERNEL_ADDRESS_ALLPROC, (void *)KERNEL_ADDRESS_ROOTVNODE,
+       (void *)KERNEL_ADDRESS_SECURITY_FLAGS, (void *)KERNEL_ADDRESS_QA_FLAGS);
+  logf("sdk proc offsets: pid=0x%zx ucred=0x%zx fd=0x%zx",
+       (size_t)KERNEL_OFFSET_PROC_P_PID, (size_t)KERNEL_OFFSET_PROC_P_UCRED,
+       (size_t)KERNEL_OFFSET_PROC_P_FD);
+  if (!KERNEL_ADDRESS_ALLPROC || KERNEL_OFFSET_PROC_P_PID <= 0 ||
+      KERNEL_OFFSET_PROC_P_UCRED <= 0) {
+    logf("unsupported firmware 0x%x: SDK returned no kernel addresses", sdk_fw);
+    notifyf("ytps5: firmware 0x%x is not supported by this build", sdk_fw);
+    return 1;
+  }
   logf("sdk rootvnode=%p libhijacker_rootvnode=%p", (void *)KERNEL_ADDRESS_ROOTVNODE,
        (void *)(kernel_base + offsets::root_vnode()));
 

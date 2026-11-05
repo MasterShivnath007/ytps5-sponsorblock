@@ -20,6 +20,14 @@ The `libhijacker.a` archive is built from the vendored `libhijacker/source`
 with the PS5 payload SDK. It is included for reproducible builds; you can rebuild
 it from that source or point `ETAHEN_DIR` at an external checkout.
 
+**Local patch:** `libhijacker/source/offsets.cpp` and the bundled
+`libhijacker.a` carry one addition over the pinned upstream commit: kernel
+offsets for firmware 11.00, 11.20, 11.40 and 11.60. Values come from the
+PS5 payload SDK's own `crt/kernel.c` table (`0x11400000` case) and
+`EchoStretch/kstuff-lite` `prosper0gdb/offsets/11_40.h`. Upstream
+etaHEN-Plugins stops at 10.60, which is why the unpatched build could not
+attach on 11.40.
+
 ## PS5 payload SDK
 
 - Not vendored; install it separately.

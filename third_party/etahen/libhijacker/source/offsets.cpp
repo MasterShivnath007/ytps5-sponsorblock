@@ -63,6 +63,14 @@ static constexpr uint32_t V1020 = 0x10200000;
 static constexpr uint32_t V1040 = 0x10400000;
 static constexpr uint32_t V1060 = 0x10600000;
 
+/* 11.x - taken from ps5-payload-sdk crt/kernel.c (0x11400000) and
+ * EchoStretch/kstuff-lite prosper0gdb/offsets/11_40.h. 11.00, 11.20, 11.40
+ * and 11.60 share the same kernel layout in both tables. */
+static constexpr uint32_t V1100 = 0x11000000;
+static constexpr uint32_t V1120 = 0x11200000;
+static constexpr uint32_t V1140 = 0x11400000;
+static constexpr uint32_t V1160 = 0x11600000;
+
 
 
 
@@ -119,6 +127,9 @@ namespace offsets {
             case V1000: case V1001: case V1020: case V1040: case V1060:
                 allprocOffset = 0x2765D70;
                 break;
+            case V1100: case V1120: case V1140: case V1160:
+                allprocOffset = 0x2875D70;
+                break;
             default:
                 printf("Unsupported firmware version: 0x%x\n", getSystemSwVersion() & VERSION_MASK);
                 allprocOffset = -1;
@@ -156,6 +167,8 @@ namespace offsets {
                 return 0x0D73064;
             case V1000: case V1001: case V1020: case V1040: case V1060:
                 return 0x0D79064;
+            case V1100: case V1120: case V1140: case V1160:
+                return 0x0D8C064;
             default:
                 printf("Unsupported firmware version: 0x%x\n", getSystemSwVersion() & VERSION_MASK);
                 return -1;
@@ -186,6 +199,8 @@ namespace offsets {
                 return 0x0D73064 + 0x24;
             case V1000: case V1001: case V1020: case V1040: case V1060:
                 return 0x0D79064 + 0x24;
+            case V1100: case V1120: case V1140: case V1160:
+                return 0x0D8C064 + 0x24;
             default:
                 printf("Unsupported firmware version: 0x%x\n", getSystemSwVersion() & VERSION_MASK);
                 return -1;
@@ -216,6 +231,8 @@ namespace offsets {
                 return 0x0D73064 + 0x8C;
             case V1000: case V1001: case V1020: case V1040: case V1060:
                 return 0x0D79064 + 0x8C;
+            case V1100: case V1120: case V1140: case V1160:
+                return 0x0D8C064 + 0x8C;
             default:
                 printf("Unsupported firmware version: 0x%x\n", getSystemSwVersion() & VERSION_MASK);
                 return -1;
@@ -250,6 +267,8 @@ namespace offsets {
                 return 0x2FDB510;
             case V1000: case V1001: case V1020: case V1040: case V1060:
                 return 0x2FA3510;
+            case V1100: case V1120: case V1140: case V1160:
+                return 0x30B7510;
             default:
                 printf("Unsupported firmware version: 0x%x\n", getSystemSwVersion() & VERSION_MASK);
                 return -1;

@@ -74,7 +74,7 @@ version exists.
 
 ## Limits
 
-- Tested on firmware 8.20 with YouTube `01.000.003` (`PPSA01652`). Any `PPSA0165x` build of that version can be patched.
+- Tested on firmware 8.20 and 11.40 with YouTube `01.000.003` (`PPSA01652`). Any `PPSA0165x` build of that version can be patched. The kernel layer follows the payload SDK from 1.00 to 13.60.
 - The `HTMLScriptExecute` signature is matched against the tested app build.
   A store update can change it.
 - The patch is memory-only and is cleared by a console reboot or app exit. The

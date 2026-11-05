@@ -1,6 +1,6 @@
 # Testing
 
-Test target: **PS5 firmware 8.20**, Y2JB + Relapse, etaHEN with FTP on `2121`
+Test targets: **PS5 firmware 8.20 and 11.40**, Y2JB + Relapse, etaHEN with FTP on `2121`
 and `elfldr` on `9021`, YouTube **`01.000.003`** (tested on `PPSA01652`).
 
 `PPSA01650`/`PPSA01651` are Y2JB daily drivers and are refused by default. To

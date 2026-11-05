@@ -6,7 +6,7 @@
 
 [![Release](https://img.shields.io/github/v/release/MasterShivnath007/ytps5-sponsorblock?color=orange)](https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
-[![Firmware: 8.20](https://img.shields.io/badge/firmware-8.20-black.svg)](#compatibility)
+[![Firmware: 8.20 | 11.40](https://img.shields.io/badge/firmware-8.20%20%7C%2011.40-black.svg)](#compatibility)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github)](https://github.com/sponsors/MasterShivnath007)
 
 **Block YouTube ads and skip sponsor segments in the official PS5 video app — no package install, no app replacement.**
@@ -26,7 +26,7 @@ second homebrew app, no package, no app replacement.
 
 ## Install in two minutes
 
-**You need:** a jailbroken PS5 on **firmware 8.20**, the YouTube app
+**You need:** a jailbroken PS5 on **firmware 8.20 or 11.40** (both verified), the YouTube app
 (**`PPSA01652`** by default — any `PPSA0165x` build works, see
 [compatibility](#compatibility)), and a way to run an ELF (Payload Manager, or
 any ELF loader).
@@ -67,12 +67,20 @@ save data, `download0.dat`, or the Y2JB autoloader.
 > **Research and educational project.** Not affiliated with Sony, Google,
 > YouTube, SponsorBlock, or any app vendor. No app packages, keys, DRM bypass
 > tools, or copyrighted content are distributed. You must already own the app.
-> **Tested on PS5 firmware 8.20 with YouTube `01.000.003` (`PPSA01652`).** Any `PPSA0165x`
-> build can be patched; the title is chosen in `config.txt`. Use at your own
-> risk; no warranty. The Y2JB apps `PPSA01650`/`PPSA01651` are refused by
-> default; patching them requires an explicit opt-in.
+> **Tested on PS5 firmware 8.20 and 11.40 with YouTube `01.000.003`
+> (`PPSA01652`).** Any `PPSA0165x` build can be patched; the title is chosen in
+> `config.txt`. The kernel layer follows the payload SDK from 1.00 to 13.60;
+> other firmware is untested at the app layer. Use at your own risk; no
+> warranty. The Y2JB apps `PPSA01650`/`PPSA01651` are refused by default;
+> patching them requires an explicit opt-in.
 
 ## Compatibility
+
+| Firmware | Status |
+| --- | --- |
+| **8.20** | 🟢 **Verified** on real hardware with YouTube `01.000.003`. |
+| **11.40** | 🟢 **Verified** on real hardware with YouTube `01.000.003`. |
+| **1.00 – 13.60** | 🟡 **Kernel layer covered** by the payload SDK. The app-side scan depends on the YouTube build; logs are welcome if it stops at `target not found`. |
 
 | App | Role | Status |
 | --- | --- | --- |
@@ -270,10 +278,12 @@ YouTube app (default target `PPSA01652`; any `PPSA0165x` build works). ytps5
 filters in-player, feed and hero ads in memory; it does not patch the installed
 app package. See [Install](#install-in-two-minutes).
 
-### Does ytps5 work on PS5 firmware 8.20?
-FW 8.20 with YouTube `01.000.003` (`PPSA01652`) has been tested. Any `PPSA0165x` build of
-that version can be patched; other firmware is untested because the
-`HTMLScriptExecute` signature can differ.
+### Which PS5 firmware does ytps5 work on?
+Firmware **8.20** and **11.40** with YouTube `01.000.003` (`PPSA01652`) are
+verified on real hardware. The kernel layer follows the payload SDK from 1.00
+to 13.60, so other firmware should attach too, but the `HTMLScriptExecute`
+signature can differ between app builds. If it stops at `target not found`,
+send the log.
 
 ### Do I need a jailbroken PS5?
 Yes. ytps5 attaches to the running app with libhijacker and patches the process
@@ -293,7 +303,7 @@ Yes. SponsorBlock segments are fetched from the public API through the local
 proxy and skipped with a toast. Categories can be toggled in ytps5 Settings.
 
 ### Can I use it on a PS4 or PS5 Pro?
-It targets the native PS5 app on FW 8.20. PS4-compatibility titles such as
+It targets the native PS5 app on FW 8.20 and 11.40. PS4-compatibility titles such as
 `CUSA01116` and untested hardware are unsupported.
 
 ### How do I uninstall it?

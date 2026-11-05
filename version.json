@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "url": "https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest",
-  "notes": "Per-app selection via /data/ytps5-sponsorblock/config.txt"
+  "notes": "Firmware 1.00-13.60 kernel layer; verified on 8.20 and 11.40"
 }

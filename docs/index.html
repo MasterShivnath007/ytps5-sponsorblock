@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Block YouTube ads on PS5 — ytps5 (unofficial, FW 8.20)</title>
-<meta name="description" content="Unofficial mod that filters YouTube ads and skips SponsorBlock in the official PS5 video app (FW 8.20). Free, open source; no app packages or keys.">
+<title>Block YouTube ads on PS5 — ytps5 (unofficial, FW 8.20 / 11.40)</title>
+<meta name="description" content="Unofficial mod that filters YouTube ads and skips SponsorBlock in the official PS5 video app (FW 8.20 and 11.40). Free, open source; no app packages or keys.">
 <meta name="author" content="MasterShivnath007">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#0b1220">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ytps5">
 <meta property="og:title" content="Block YouTube ads on PS5 — ytps5 (unofficial)">
-<meta property="og:description" content="Ad filtering + SponsorBlock for the official PS5 video app on jailbroken FW 8.20. Free and open source; no app packages, keys, or DRM tools.">
+<meta property="og:description" content="Ad filtering + SponsorBlock for the official PS5 video app on jailbroken FW 8.20 and 11.40. Free and open source; no app packages, keys, or DRM tools.">
 <meta property="og:url" content="https://mastershivnath007.github.io/ytps5-sponsorblock/">
 <meta property="og:image" content="https://mastershivnath007.github.io/ytps5-sponsorblock/media/hero.png">
 <meta property="og:image:width" content="1280">
@@ -26,7 +26,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Block YouTube ads on PS5 — ytps5 (unofficial)">
-<meta name="twitter:description" content="Ad filtering + SponsorBlock for the official PS5 video app on jailbroken FW 8.20. Free and open source.">
+<meta name="twitter:description" content="Ad filtering + SponsorBlock for the official PS5 video app on jailbroken FW 8.20 and 11.40. Free and open source.">
 <meta name="twitter:image" content="https://mastershivnath007.github.io/ytps5-sponsorblock/media/hero.png">
 
 <script type="application/ld+json">
@@ -39,9 +39,9 @@
       "alternateName": "ytps5-sponsorblock",
       "applicationCategory": "UtilitiesApplication",
       "applicationSubCategory": "Console runtime mod",
-      "operatingSystem": "PlayStation 5 firmware 8.20",
+      "operatingSystem": "PlayStation 5 firmware 8.20 and 11.40 (kernel layer 1.00-13.60)",
       "softwareVersion": "1.1.0",
-      "description": "An unofficial runtime mod that filters ads and skips SponsorBlock segments in the official PS5 video app on jailbroken firmware 8.20. It patches the running process in memory and distributes no app packages, console keys, DRM tools, or copyrighted files.",
+      "description": "An unofficial runtime mod that filters ads and skips SponsorBlock segments in the official PS5 video app on jailbroken firmware 8.20 and 11.40. It patches the running process in memory and distributes no app packages, console keys, DRM tools, or copyrighted files.",
       "url": "https://mastershivnath007.github.io/ytps5-sponsorblock/",
       "downloadUrl": "https://github.com/MasterShivnath007/ytps5-sponsorblock/releases/latest",
       "codeRepository": "https://github.com/MasterShivnath007/ytps5-sponsorblock",
@@ -70,10 +70,10 @@
         },
         {
           "@type": "Question",
-          "name": "Does ytps5 work on PS5 firmware 8.20?",
+          "name": "Which PS5 firmware does ytps5 work on?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Firmware 8.20 with YouTube 01.000.003 (PPSA01652) has been tested. Any PPSA0165x build of that version can be patched by naming it in config.txt. Other firmware is untested because the HTMLScriptExecute signature can differ."
+            "text": "Firmware 8.20 and 11.40 with YouTube 01.000.003 (PPSA01652) are verified on real hardware. The kernel layer follows the payload SDK from 1.00 to 13.60, so other firmware should attach too, but the HTMLScriptExecute signature can differ between app builds."
           }
         },
         {
@@ -144,7 +144,7 @@
 
 <section class="hero">
   <div class="wrap">
-    <div class="eyebrow"><span class="dot" aria-hidden="true"></span><b>Unofficial</b> · FW 8.20 · YouTube 01.000.003 · PPSA01652</div>
+    <div class="eyebrow"><span class="dot" aria-hidden="true"></span><b>Unofficial</b> · FW 8.20 / 11.40 · YouTube 01.000.003 · PPSA01652</div>
     <h1>Block YouTube ads and skip sponsor segments on the PS5.</h1>
     <p class="lede">
       ytps5 is a free, open-source runtime mod for the official PS5 video app on
@@ -169,9 +169,9 @@
       <strong>Research and educational project.</strong> Not affiliated with Sony,
       Google, YouTube, or SponsorBlock. No app packages, console keys, DRM bypass
       tools, or copyrighted content are distributed; you must already own the app.
-      Tested on PS5 firmware 8.20 with YouTube <code>01.000.003</code>
-      (<code>PPSA01652</code>). Any
-      <code>PPSA0165x</code> build can be patched; pick it in <code>config.txt</code>.
+      Tested on PS5 firmware 8.20 and 11.40 with YouTube <code>01.000.003</code>
+      (<code>PPSA01652</code>). The kernel layer covers 1.00–13.60 via the payload
+      SDK. Any <code>PPSA0165x</code> build can be patched; pick it in <code>config.txt</code>.
       The Y2JB apps <code>PPSA01650</code>/<code>PPSA01651</code> are refused by
       default; patching them needs an explicit opt-in. Use at your own risk; no
       warranty.
@@ -235,8 +235,21 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Compatibility</div>
-      <h2>One tested target. Everything else is marked.</h2>
+      <h2>Two verified firmwares. Every app is marked.</h2>
+      <p>Firmware <b>8.20</b> and <b>11.40</b> are verified on real hardware. The kernel layer follows the payload SDK from 1.00 to 13.60; newer app builds may need a signature update.</p>
       <p>The injector checks the title before patching and refuses the Y2JB daily drivers on purpose.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Firmware</th><th scope="col">Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>8.20</b></td><td class="yes">Verified — YouTube 01.000.003</td></tr>
+          <tr><td><b>11.40</b></td><td class="yes">Verified — YouTube 01.000.003</td></tr>
+          <tr><td>1.00 – 13.60</td><td class="partial">Kernel covered by SDK; app build may differ</td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="table-wrap">
       <table>
@@ -329,8 +342,8 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
         <div class="answer"><p>On a jailbroken PS5, run <code>ytps5.elf</code> once with Payload Manager, then open your YouTube app (default <code>PPSA01652</code>). ytps5 filters in-player, feed and hero ads in memory and does not patch the installed app package.</p></div>
       </details>
       <details>
-        <summary>Does ytps5 work on PS5 firmware 8.20?</summary>
-        <div class="answer"><p>Firmware 8.20 with YouTube <code>01.000.003</code> (<code>PPSA01652</code>) has been tested. Any <code>PPSA0165x</code> build of that version can be patched; other firmware is untested because the <code>HTMLScriptExecute</code> signature can differ.</p></div>
+        <summary>Which PS5 firmware does ytps5 work on?</summary>
+        <div class="answer"><p>Firmware <b>8.20</b> and <b>11.40</b> with YouTube <code>01.000.003</code> (<code>PPSA01652</code>) are verified on real hardware. The kernel layer follows the payload SDK from 1.00 to 13.60, so other firmware should attach too; the <code>HTMLScriptExecute</code> signature can differ between app builds.</p></div>
       </details>
       <details>
         <summary>Do I need a jailbroken PS5?</summary>
@@ -350,7 +363,7 @@ allow_y2jb=0            # 1 = allow patching PPSA01650/PPSA01651</code></pre>
       </details>
       <details>
         <summary>Can I use it on a PS4 or PS5 Pro?</summary>
-        <div class="answer"><p>It targets the native PS5 app on FW 8.20. PS4-compatibility titles such as <code>CUSA01116</code> and untested hardware are unsupported.</p></div>
+        <div class="answer"><p>It targets the native PS5 app on FW 8.20 and 11.40. PS4-compatibility titles such as <code>CUSA01116</code> and untested hardware are unsupported.</p></div>
       </details>
       <details>
         <summary>How do I uninstall it?</summary>

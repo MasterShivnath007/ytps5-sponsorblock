@@ -50,10 +50,14 @@ sdk:
 minify:
 	npx --yes terser payload/inject.src.js -c -m -o payload/inject.js
 
-payload-header: payload/inject.js
+payload-header: module/payload_js.h
+
+module/payload_js.h: payload/inject.js scripts/gen_payload_header.py
 	@python3 scripts/gen_payload_header.py
 
-hook-blob: $(BUILD)/hook.bin
+hook-blob: injector/hook_blob.h
+
+injector/hook_blob.h: $(BUILD)/hook.bin scripts/gen_hook_blob.py
 	@python3 scripts/gen_hook_blob.py
 
 $(BUILD):
@@ -72,7 +76,9 @@ $(BUILD)/hook.bin: $(BUILD)/hook.o
 # ---------------------------------------------------------------------------
 # Direct HTMLScriptExecute hook blob (runs in the app, no dlopen)
 # ---------------------------------------------------------------------------
-direct-blob: $(BUILD)/direct_hook.bin
+direct-blob: injector/direct_hook_blob.h
+
+injector/direct_hook_blob.h: $(BUILD)/direct_hook.bin scripts/gen_hook_blob.py
 	@python3 scripts/gen_hook_blob.py build/direct_hook.bin \
 		injector/direct_hook_blob.h ytps5_direct_blob ytps5_direct_blob_len
 
@@ -148,4 +154,4 @@ dist: all
 	@ls -lh ytps5-sponsorblock.zip
 
 clean:
-	rm -rf $(BUILD) dist ytps5-sponsorblock.zip injector/hook_blob.h module/payload_js.h
+	rm -rf $(BUILD) dist ytps5-sponsorblock.zip injector/hook_blob.h injector/direct_hook_blob.h module/payload_js.h
